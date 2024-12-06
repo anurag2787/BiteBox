@@ -12,7 +12,7 @@ const LoginPage = () => {
       <div className="flex flex-col items-center justify-center">
         {/* Logo or Brand Section */}
         <div className="mb-8 text-center">
-          <h1 className={`text-4xl font-extrabold ${darkMode?"text-white":"text-black"} mb-2`}>Welcome to Foodie</h1>
+          <h1 className={`text-4xl font-extrabold ${darkMode?"text-white":"text-black"} mb-2`}>Welcome to BiteBox</h1>
           <p className={`${darkMode?"text-white":"text-black"} `}>Sign in to access your account</p>
         </div>
         
@@ -23,7 +23,7 @@ const LoginPage = () => {
         
         {/* Footer */}
         <div className={`mt-8 text-center ${darkMode?" text-blue-100":"text-black"} text-sm  text-black`}>
-          <p>© 2024 Your Company. All rights reserved.</p>
+          <p>© 2024 BiteBox. All rights reserved.</p>
         </div>
       </div>
     </div>

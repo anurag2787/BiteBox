@@ -62,7 +62,7 @@ const Navbar = () => {
                             className="text-white font-mono font-bold text-2xl hover:text-yellow-200 
                             transition-colors duration-200"
                         >
-                            Foodie
+                            BiteBox
                         </Link>
                     </div>
 
@@ -70,8 +70,8 @@ const Navbar = () => {
                     <div className="hidden md:flex items-center space-x-4">
                         <div className="flex space-x-4 items-center text-white">
                             <NavLink href="/">Home</NavLink>
-                            <NavLink href="/about">About</NavLink>
                             <NavLink href="/menu">Menu</NavLink>
+                            <NavLink href="/about">About</NavLink>
                             <NavLink href="/contact">Contact</NavLink>
                             <div className="px-2">
                                 <DarkModeToggle />
@@ -89,9 +89,6 @@ const Navbar = () => {
                                         <Link href="/profile">
                                             <AuthButton>Profile</AuthButton>
                                         </Link>
-                                        <AuthButton onClick={handleSignOut}>
-                                            Sign Out
-                                        </AuthButton>
                                     </>
                                 )}
                             </div>
@@ -119,8 +116,9 @@ const Navbar = () => {
                 <div className="md:hidden bg-yellow-500 shadow-inner">
                     <div className="px-2 pt-2 pb-3 space-y-1">
                         <NavLink href="/">Home</NavLink>
-                        <NavLink href="/about">About</NavLink>
                         <NavLink href="/menu">Menu</NavLink>
+                        <NavLink href="/Recipes">Recipes</NavLink>
+                        <NavLink href="/about">About</NavLink>
                         <NavLink href="/contact">Contact</NavLink>
                         <div className="px-4 py-2">
                             <DarkModeToggle />

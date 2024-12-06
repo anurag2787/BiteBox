@@ -7,8 +7,8 @@ const Footer = () => {
       <Section>
         <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
           <div className="mb-4 md:mb-0">
-            <h2 className="text-2xl font-bold">Foodie </h2>
-            <p className="text-gray-400">Delicious food delivered to your door</p>
+            <h2 className="text-2xl font-bold">BiteBox </h2>
+            <p className="text-gray-400">Delicious food Recipes at you fingertips</p>
           </div>
           <div className="flex space-x-4">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:text-gray-300">
@@ -36,7 +36,7 @@ const Footer = () => {
               <Link href="/Error404" className="hover:text-gray-300">FAQ</Link>
             </div>
           <div className="text-center text-gray-400 mt-5">
-            &copy; {new Date().getFullYear()} Foodie . All rights reserved.
+            &copy; {new Date().getFullYear()} BiteBox . All rights reserved.
           </div>
           <div className="flex flex-row justify-center mt-4 mb-0">
             Made with love by Mayank❤️

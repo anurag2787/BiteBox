@@ -1,64 +1,128 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import gif from '../../../public/err.gif'
-import Image from 'next/image'
-import { useDarkMode } from '../DarkModeContext'
+import React from "react";
+import Image from "next/image";
+import { useDarkMode } from "../DarkModeContext";
+import { UserAuth } from "../context/AuthContext";
 
-export default function Page() {
-  const { darkMode } = useDarkMode()
-  console.log(darkMode)
+function ProfilePage() {
+  const { darkMode } = useDarkMode();
+  const { user,  logOut } = UserAuth(); 
+
+  const handleSignOut = async () => {
+    try {
+        await logOut();
+        setIsOpen(false);
+    } catch (error) {
+        console.error("Error signing out: ", error);
+    }
+};
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-lg text-gray-500">Loading user details...</p>
+      </div>
+    );
+  }
 
   return (
     <div
-      className={`h-screen w-full ${
-        darkMode ? 'bg-gray-900 text-white' : 'bg-white-600 text-gray-900'
-      }`}
+      className={`min-h-screen ${
+        darkMode ? "bg-black text-white" : "bg-white text-gray-800"
+      } transition-colors duration-300 flex items-center justify-center px-4 py-8`}
     >
-      <section className='home grid h-screen pt-32 pb-16'>
-        <div className='home__container container grid content-center gap-12 lg:max-w-5xl lg:grid-cols-2 lg:items-center'>
-          {/* Error Message Section */}
-          <div className='home__data justify-self-center text-center lg:text-left'>
-            <p className='pb-2 text-5xl font-semibold lg:text-6xl'>Error 404</p>
-            <h1 className='pb-4 text-5xl font-bold'>Sorry, Customers</h1>
-            <p className='pb-8 font-semibold'>
-              We can&apos;t seem to find the page <br />
-              you are looking for.
-            </p>
-            <Link legacyBehavior href='/' passHref>
-              <a className='inline-flex items-center justify-center rounded-full bg-gray-900 py-4 px-8 font-bold text-white transition-transform duration-300 transform hover:scale-105 hover:bg-gray-700'>
-                Go Home
-              </a>
-            </Link>
-          </div>
-
-          {/* Error Image Section */}
-          <div className='home__img justify-self-center p-4'>
-            <Image
-              src={gif}
-              alt='Error 404'
-              className='max-w-xs md:max-w-sm mx-auto'
-            />
+      <div
+        className={`w-full max-w-md ${
+          darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"
+        } shadow-xl rounded-2xl overflow-hidden border`}
+      >
+        <div className="bg-black h-24 relative">
+          <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2">
+            <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden shadow-lg">
+              <Image
+                src={user.photoURL || "/default-avatar.png"}
+                alt="Profile Picture"
+                width={128}
+                height={128}
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
         </div>
 
-        {/* Footer Section */}
-        <div className='home__footer flex items-center justify-center gap-4 self-end text-sm font-semibold text-gray-700 dark:text-gray-400 mt-12'>
-          <p className='flex items-center gap-1'>
-            <span role='img' aria-label='phone'>
-              📞
-            </span>{' '}
-            +91-8493628282
+        <div className="pt-20 text-center">
+          <h1
+            className={`text-2xl font-bold ${
+              darkMode ? "text-white" : "text-gray-800"
+            }`}
+          >
+            {user.displayName || "User Profile"}
+          </h1>
+          <p className={`${darkMode ? "text-gray-400" : "text-gray-600"} mt-2`}>
+            {user.email}
           </p>
-          <p>|</p>
-          <p className='flex items-center gap-1'>
-            <span role='img' aria-label='email'>
-              ✉️
-            </span>{' '}
-            info@Foodie.com
-          </p>
+
+          <div className="mt-8 px-6">
+            <div
+              className={`${
+                darkMode ? "bg-gray-700" : "bg-gray-50"
+              } rounded-lg p-4 space-y-4`}
+            >
+              <div>
+                <h3 className="text-xs font-semibold text-gray-500 uppercase">
+                  User Details
+                </h3>
+                {[
+                  { label: "Display Name", value: user.displayName || "Not Set" },
+                  { label: "Email", value: user.email },
+                  {
+                    label: "Account Created",
+                    value: user.metadata?.creationTime
+                      ? new Date(user.metadata.creationTime).toLocaleDateString()
+                      : "Unknown",
+                  },
+                ].map((detail, index) => (
+                  <div
+                    key={index}
+                    className={`mt-2 flex justify-between items-center py-2 ${
+                      index < 2 ? "border-b" : ""
+                    } ${darkMode ? "border-gray-600" : "border-gray-200"}`}
+                  >
+                    <span
+                      className={`${darkMode ? "text-gray-300" : "text-gray-700"}`}
+                    >
+                      {detail.label}
+                    </span>
+                    <span
+                      className={`font-medium ${
+                        darkMode ? "text-white" : "text-gray-900"
+                      }`}
+                    >
+                      {detail.value}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 px-6 pb-8">
+            <button
+              onClick={handleSignOut}
+              className={`w-full py-3 rounded-lg transition-colors duration-300 ${
+                darkMode
+                  ? "bg-yellow-500 hover:bg-red-800 text-white"
+                  : "bg-blue-500 hover:bg-red-600 text-white"
+              }`}
+            >
+              Sign Out
+            </button>
+          </div>
         </div>
-      </section>
+      </div>
     </div>
-  )
+  );
 }
+
+export default ProfilePage;

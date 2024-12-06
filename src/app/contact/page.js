@@ -120,7 +120,7 @@ function ContactUs() {
                 href='mailto:support@foodie.com'
                 className='text-blue-600 dark:text-blue-400 hover:underline'
               >
-                support@foodie.com
+                support@bitebox.com
               </a>
             </p>
             <p className='text-md'>
@@ -129,7 +129,7 @@ function ContactUs() {
                 href='https://twitter.com/foodie'
                 className='text-blue-600 dark:text-blue-400 hover:underline'
               >
-                Twitter@foodie
+                Twitter@foodiebitebox
               </a>
             </p>
           </div>
