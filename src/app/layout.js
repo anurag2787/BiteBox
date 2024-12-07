@@ -8,8 +8,8 @@ import { DarkModeProvider } from "./DarkModeContext";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Foodie",
-  description: "Get the best food in town.",
+  title: "BiteBox",
+  description: "Get the Recipes for any Cuisines.",
 };
 
 export default function RootLayout({ children }) {

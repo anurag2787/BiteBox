@@ -21,8 +21,9 @@ const RecipesPage = () => {
         fetchRecipes();
     }, []);
 
-    const handleRecipeClick = (id) => {
-        router.push(`/recipes/${id}`);
+    const handleRecipeClick = (recipe) => {
+        const query = encodeURIComponent(JSON.stringify(recipe));
+        router.push(`/recipes/view?data=${query}`);
     };
 
     const handlePostRecipeClick = () => {
@@ -31,24 +32,33 @@ const RecipesPage = () => {
 
     return (
         <div className="container mx-auto p-4">
-            <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-bold">Recipes</h1>
+            {/* Header with Title and Post Recipe Button */}
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-3xl font-bold">Recipes</h1>
                 <button
                     onClick={handlePostRecipeClick}
-                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                 >
                     Post New Recipe
                 </button>
             </div>
+
+            {/* Recipe Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {recipes.map((recipe) => (
+                {recipes.map((recipe, index) => (
                     <div
-                        key={recipe.id}
+                        key={index}
                         className="border rounded-lg p-4 cursor-pointer hover:shadow-lg"
-                        onClick={() => handleRecipeClick(recipe.id)}
+                        onClick={() => handleRecipeClick(recipe)}
                     >
+                        {/* Cover Image */}
+                        <img
+                            src={recipe.coverImage}
+                            alt={recipe.title}
+                            className="w-full h-48 object-cover rounded-md mb-4"
+                        />
+                        {/* Title */}
                         <h2 className="text-xl font-semibold mb-2">{recipe.title}</h2>
-                        <p className="text-gray-700">{recipe.description}</p>
                     </div>
                 ))}
             </div>

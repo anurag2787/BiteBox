@@ -1,10 +1,8 @@
-// postrecipepage.js
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import axios from 'axios';
-import 'draft-js/dist/Draft.css';
 import {
   Bold,
   Italic,
@@ -20,8 +18,7 @@ import {
   Sun,
   Moon,
 } from 'lucide-react';
-import { UserAuth } from '../context/AuthContext';  
-import { useDarkMode } from '../DarkModeContext'; // Import the hook
+import { useDarkMode } from '../DarkModeContext'; // Import the dark mode hook
 
 // Dynamically import Draft.js
 const DraftJs = dynamic(() => import('draft-js'), { ssr: false });
@@ -29,12 +26,13 @@ const DraftJs = dynamic(() => import('draft-js'), { ssr: false });
 const PostRecipePage = () => {
   const [mounted, setMounted] = useState(false);
   const [title, setTitle] = useState('');
+  const [coverImage, setImageUrl] = useState('');
+  const [category, setCategory] = useState('');
   const [editorState, setEditorState] = useState(null);
   const [DraftModules, setDraftModules] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const { user } = UserAuth(); 
-  const { darkMode, toggleDarkMode } = useDarkMode(); // Get dark mode state and toggle function
+  const { darkMode, toggleDarkMode } = useDarkMode();
 
   useEffect(() => {
     const loadDraftJs = async () => {
@@ -70,29 +68,38 @@ const PostRecipePage = () => {
   };
 
   const handlePost = async () => {
-    if (!mounted || !editorState || !user) return;
+    if (!mounted || !editorState) return;
 
     const { convertToRaw } = DraftModules;
     const contentState = editorState.getCurrentContent();
     const content = JSON.stringify(convertToRaw(contentState));
 
-    if (!title.trim() || contentState.getPlainText().trim() === '') {
-      alert('Both title and content are required!');
+    // Validate input fields
+    if (!title.trim() || contentState.getPlainText().trim() === '' || !coverImage.trim() || !category.trim()) {
+      alert('All fields are required!');
       return;
     }
 
     setLoading(true);
     try {
-      const token = await user.getIdToken(); // Get Firebase token from the authenticated user
+      const userDetails = {
+        username: 'TestUser', // Replace with dynamic username
+        email: 'testuser@example.com', // Replace with dynamic email
+      };
 
-      // Include the token in the headers
-      const response = await axios.post('http://localhost:5000/api/recipes', 
-        { title, content },
-        { headers: { Authorization: `Bearer ${token}` } } // Send the token with the request
-      );
+      // Post the recipe data
+      const response = await axios.post('http://localhost:5000/api/recipes', {
+        title,
+        content,
+        coverImage,
+        category,
+        ...userDetails,
+      });
 
       alert('Recipe posted successfully!');
       setTitle('');
+      setImageUrl('');
+      setCategory('');
       setEditorState(DraftModules.EditorState.createEmpty());
     } catch (error) {
       console.error('Error posting recipe:', error);
@@ -127,28 +134,45 @@ const PostRecipePage = () => {
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-extrabold">Create Your Recipe</h1>
         <button
-          onClick={toggleDarkMode} // Use the toggleDarkMode from context
+          onClick={toggleDarkMode}
           className="p-2 rounded-full transition-all duration-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
         >
           {darkMode ? <Sun size={20} /> : <Moon size={20} />}
         </button>
       </div>
 
+      {/* Title Input */}
       <div className="mb-4">
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="
-            w-full text-2xl font-semibold
-            border-b-2 border-gray-300 dark:border-gray-600
-            px-4 py-2 
-            focus:border-blue-500 
-            transition 
-            placeholder-gray-400 
-            bg-transparent
-          "
+          className="w-full text-2xl font-semibold border-b-2 border-gray-300 dark:border-gray-600 px-4 py-2 focus:border-blue-500 transition placeholder-gray-400 bg-transparent"
           placeholder="Recipe Title"
+          required
+        />
+      </div>
+
+      {/* Image URL Input */}
+      <div className="mb-4">
+        <input
+          type="url"
+          value={coverImage}
+          onChange={(e) => setImageUrl(e.target.value)}
+          className="w-full text-lg border-b-2 border-gray-300 dark:border-gray-600 px-4 py-2 focus:border-blue-500 transition placeholder-gray-400 bg-transparent"
+          placeholder="Image URL"
+          required
+        />
+      </div>
+
+      {/* Category Input */}
+      <div className="mb-4">
+        <input
+          type="text"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="w-full text-lg border-b-2 border-gray-300 dark:border-gray-600 px-4 py-2 focus:border-blue-500 transition placeholder-gray-400 bg-transparent"
+          placeholder="Category (e.g., Dessert, Main Course)"
           required
         />
       </div>
