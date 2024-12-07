@@ -1,4 +1,3 @@
-// app/context/AuthContext.js
 'use client';
 import { useContext, createContext, useState, useEffect } from "react";
 import { useRouter } from 'next/navigation';
@@ -9,9 +8,11 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
-  onAuthStateChanged
+  onAuthStateChanged,
+  getIdToken // Add this import
 } from 'firebase/auth';
-import { auth } from '../firebase'; 
+import { auth } from '../firebase';
+import axios from 'axios';  // Assuming you're using Axios to make requests
 
 const AuthContext = createContext();
 
@@ -46,15 +47,13 @@ export const AuthContextProvider = ({ children }) => {
   const emailSignUp = async (email, password, displayName) => {
     setLoading(true);
     try {
-      //-------------signup page for firebase----------
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password,
-          displayName
-        );
-        const user = userCredential.user;
-        console.log("User signed up:", user);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      console.log("User signed up:", user);
 
       await updateProfile(userCredential.user, { displayName });
       setUser({ ...userCredential.user, displayName });
@@ -70,15 +69,13 @@ export const AuthContextProvider = ({ children }) => {
   const emailSignIn = async (email, password) => {
     setLoading(true);
     try {
-      //------signin code for firebase ----------
-        const userCredential = await signInWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        const user = userCredential.user;
-        console.log("User signed in:", user);
-
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      console.log("User signed in:", user);
 
       router.push('/');
     } catch (error) {
@@ -103,8 +100,50 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
+  // Function to retrieve the Firebase token
+  const getAuthToken = async () => {
+    if (user) {
+      try {
+        const token = await getIdToken(user); // Get the Firebase ID token
+        return token;
+      } catch (error) {
+        console.error("Error getting Firebase token: ", error);
+        throw error;
+      }
+    }
+    return null;
+  };
+
+  // Example of making a request with the token (for example, posting a recipe)
+  const postRecipeWithToken = async (recipeData) => {
+    const token = await getAuthToken();
+    if (token) {
+      try {
+        await axios.post('http://localhost:5000/api/recipes', recipeData, {
+          headers: {
+            Authorization: `Bearer ${token}`,  // Send the token in the header
+          },
+        });
+      } catch (error) {
+        console.error("Error posting recipe: ", error);
+        throw error;
+      }
+    } else {
+      console.error("No valid token found");
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, googleSignIn, emailSignUp, emailSignIn, logOut, loading }}>
+    <AuthContext.Provider value={{
+      user, 
+      googleSignIn, 
+      emailSignUp, 
+      emailSignIn, 
+      logOut, 
+      loading,
+      postRecipeWithToken,  // Share this method to post recipes with the token
+      getAuthToken,  // Share the method to get the token
+    }}>
       {children}
     </AuthContext.Provider>
   );

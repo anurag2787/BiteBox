@@ -71,8 +71,8 @@ const Navbar = () => {
                         <div className="flex space-x-4 items-center text-white">
                             <NavLink href="/">Home</NavLink>
                             <NavLink href="/menu">Menu</NavLink>
+                            <NavLink href="/recipes">Recipes</NavLink>
                             <NavLink href="/about">About</NavLink>
-                            <NavLink href="/contact">Contact</NavLink>
                             <div className="px-2">
                                 <DarkModeToggle />
                             </div>
