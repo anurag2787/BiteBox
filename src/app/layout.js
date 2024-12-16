@@ -4,6 +4,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { AuthContextProvider } from "../app/context/AuthContext";
 import { DarkModeProvider } from "./DarkModeContext";
+import Footer from "@/Components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 

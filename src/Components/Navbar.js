@@ -73,6 +73,8 @@ const Navbar = () => {
                             <NavLink href="/menu">Menu</NavLink>
                             <NavLink href="/recipes">Recipes</NavLink>
                             <NavLink href="/about">About</NavLink>
+                            <NavLink href="/chat">Chat</NavLink>
+
                             <div className="px-2">
                                 <DarkModeToggle />
                             </div>
