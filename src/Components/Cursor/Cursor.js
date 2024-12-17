@@ -8,15 +8,15 @@ const Cursor = () => {
   const requestRef = useRef();
 
   const colors = [
-    "#FF1493",  // Deep Pink
-    "#FF69B4",  // Hot Pink
-    "#FFB6C1",  // Light Pink
-    "#FFC0CB",  // Pink
-    "#DB7093",  // Pale Violet Red
-    "#C71585",  // Medium Violet Red
-    "#FF00FF",  // Magenta
-    "#FF00FF",  // Fuchsia
-    "#FF1493",  // Deep Pink (repeated for smoother transition)
+    "#FFFF00",  // Yellow
+  "#FFD700",  // Gold
+  "#FFC107",  // Amber
+  "#FFECB3",  // Light Amber
+  "#FFF9C4",  // Lemon Chiffon
+  "#FFEB3B",  // Bright Yellow
+  "#FFF176",  // Pale Yellow
+  "#FFF8E1",  // Light Butter Yellow
+  "#FFFFE0",  // Light Yellow (repeated for smoother transition)
   ];
 
   useEffect(() => {
