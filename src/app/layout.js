@@ -6,6 +6,7 @@ import { AuthContextProvider } from "../app/context/AuthContext";
 import { DarkModeProvider } from "./DarkModeContext";
 import Footer from "@/Components/Footer";
 import Ai from "@/Components/Ai/Ai";
+import Cursor from "@/Components/Cursor/Cursor";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
           <DarkModeProvider>
           <Navbar />
           <Ai />
+          <Cursor />
           {children}
           </DarkModeProvider>
         </AuthContextProvider>
