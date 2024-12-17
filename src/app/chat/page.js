@@ -37,7 +37,7 @@ function Chat() {
 
   const generateInitialGreeting = () => {
     const greetings = [
-      "Hey there! 👋 I'm BiteBox AI, your culinary companion. How can I help you today?",
+      "Hey there! 👋 I'm BiteBox AI, your culinary companion. How can I help you today ?",
       "Hi! 🍳 Welcome to BiteBox AI. I'm here to chat about anything food-related or just have a friendly conversation!",
       "Hello! 🥘 Ready to explore some culinary magic or just have a chat? I'm all ears!"
     ];
@@ -294,3 +294,6 @@ Respond in a friendly, natural manner. Use markdown for formatting if needed. Ad
 }
 
 export default Chat;
+
+
+

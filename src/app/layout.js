@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import { AuthContextProvider } from "../app/context/AuthContext";
 import { DarkModeProvider } from "./DarkModeContext";
 import Footer from "@/Components/Footer";
+import Ai from "@/Components/Ai/Ai";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +21,7 @@ export default function RootLayout({ children }) {
         <AuthContextProvider>
           <DarkModeProvider>
           <Navbar />
+          <Ai />
           {children}
           </DarkModeProvider>
         </AuthContextProvider>
