@@ -30,7 +30,7 @@ function Chat() {
   const cleanResponse = (responseText) => {
     // Remove any leading asterisks or colons
     let cleaned = responseText.replace(/^[\*:]+/, '').trim();
-    
+
     // Ensure the first letter is capitalized
     return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
   };
@@ -47,7 +47,7 @@ function Chat() {
   useEffect(() => {
     setAnswer("Initializing BiteBox AI...");
 
-    const p1 = SYSTEM_PROMPTS.join(" ") + 
+    const p1 = SYSTEM_PROMPTS.join(" ") +
       " Prepare to interact naturally with the user.";
     const p3 = "Acknowledge your role and be ready for a friendly, helpful conversation.";
 
@@ -76,7 +76,7 @@ function Chat() {
         setAnswer("Failed to initialize. Please try again.");
       }
     }
-    
+
     async function generateInitial3() {
       const prompt = `${historyRef.current
         .map((entry) => `${entry.role}: ${entry.text}`)
@@ -127,8 +127,8 @@ function Chat() {
     // More conversational prompt
     const prompt = `Conversation Context:
 ${history
-  .map((entry) => `${entry.role}: ${entry.text}`)
-  .join("\n")}
+        .map((entry) => `${entry.role}: ${entry.text}`)
+        .join("\n")}
 User: ${input}
 
 Respond in a friendly, natural manner. Use markdown for formatting if needed. Add emojis to make the conversation engaging.`;
@@ -179,8 +179,8 @@ Respond in a friendly, natural manner. Use markdown for formatting if needed. Ad
           {String(children).replace(/\n$/, '')}
         </SyntaxHighlighter>
       ) : (
-        <code 
-          className={`${className} bg-gray-100 text-red-600 px-1 rounded`} 
+        <code
+          className={`${className} bg-gray-100 text-red-600 px-1 rounded`}
           {...props}
         >
           {children}
@@ -209,13 +209,13 @@ Respond in a friendly, natural manner. Use markdown for formatting if needed. Ad
       <ol className="list-decimal list-inside mb-3 pl-4 space-y-1">{children}</ol>
     ),
     p: ({ children }) => (
-      <p className="mb-3 leading-relaxed text-gray-700">{children}</p>
+      <p className=" leading-relaxed text-gray-700">{children}</p>
     ),
     a: ({ node, ...props }) => (
-      <a 
-        {...props} 
+      <a
+        {...props}
         className="text-emerald-600 hover:underline hover:text-emerald-800"
-        target="_blank" 
+        target="_blank"
         rel="noopener noreferrer"
       />
     ),
@@ -227,34 +227,34 @@ Respond in a friendly, natural manner. Use markdown for formatting if needed. Ad
   };
 
   return (
-    <div className="w-full h-screen flex flex-col bg-gray-100">
+    <div className="w-full h-[92vh] flex flex-col bg-gray-100 relative">
       {/* Header */}
-      <header className="bg-emerald-600 text-white p-4 shadow-md flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold">BiteBox AI</h1>
-          <p className="text-sm">Your Culinary Companion</p>
-        </div>
-        <div className="text-sm text-white/80">Powered by Gemini</div>
-      </header>
+      <div className="fixed w-[80vh] z-50">
+        <header className="bg-emerald-600 text-white p-4 pr-10 pl-10 shadow-md flex justify-between items-center w-[80%] mx-auto mt-3 mb-6 rounded-full">
+          <div>
+            <h1 className="text-2xl font-bold">BiteBox AI</h1>
+            <p className="text-sm">Your Culinary Companion</p>
+          </div>
+          <div className="text-sm text-white/80">Powered by Gemini</div>
+        </header>
+      </div>
 
       {/* Chat Container */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-white">
+      <div className="flex-1 overflow-y-auto p-6 mt-4 space-y-4 bg-white">
         {history.length > 2 &&
           history.slice(4).map((message, index) => (
             <div
               key={index}
-              className={`flex ${
-                message.role === "user" ? "justify-end" : "justify-start"
-              }`}
+              className={`flex ${message.role === "user" ? "justify-end" : "justify-start"
+                }`}
             >
               <div
-                className={`max-w-[80%] p-4 rounded-2xl shadow-md ${
-                  message.role === "user"
-                    ? "bg-emerald-500 text-white"
-                    : "bg-gray-50 text-gray-800 border"
-                }`}
+                className={`max-w-[80%] p-4 rounded-2xl shadow-md ${message.role === "user"
+                  ? "bg-emerald-500 text-white"
+                  : "bg-gray-200 text-gray-800 border"
+                  }`}
               >
-                <ReactMarkdown 
+                <ReactMarkdown
                   components={MarkdownComponents}
                   remarkPlugins={[remarkGfm]}
                   className="prose max-w-full"
@@ -272,7 +272,7 @@ Respond in a friendly, natural manner. Use markdown for formatting if needed. Ad
         <div className="flex space-x-4 max-w-4xl mx-auto">
           <input
             type="text"
-            className="flex-1 p-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 transition-all"
+            className="flex-1 p-3 border text-black border-gray-400 rounded-xl focus:ring-2 focus:ring-emerald-500 transition-all"
             placeholder="Ask me anything about food, cooking, or just chat! 🍽️"
             value={input}
             onChange={(e) => setInput(e.target.value)}
