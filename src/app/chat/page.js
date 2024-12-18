@@ -14,6 +14,7 @@ function Chat() {
   const [history, setHistory] = useState([]);
   const chatEndRef = useRef(null);
   const historyRef = useRef([]);
+  const [quickoption,setQuickoption] = useState(true)
 
   // More conversational and flexible system prompts
   const SYSTEM_PROMPTS = [
@@ -269,6 +270,24 @@ Respond in a friendly, natural manner. Use markdown for formatting if needed. Ad
 
       {/* Input Area */}
       <div className="bg-white p-4 border-t shadow-inner">
+        { quickoption ? (<div className="text-black flex flex-col justify-center items-center">
+          <div className="">
+            <div className="flex items-center justify-center">
+              <h2 className="font-bold text-xl mb-3">Feeling Hungry? Here Are Some Quick Options! 🍔🍕</h2>
+            </div>
+            <div className="flex items-center justify-center space-x-3 ">
+              <div className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2">Feeling spicy 🌶️. Any ideas?</div>
+              <div className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2">Got rice and veggies. What to cook?</div>
+              <div className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2">Pasta and tomatoes—what’s easy?</div>
+            </div>
+            <div className="flex items-center justify-center space-x-3 mt-3 mb-4">
+              <div className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2">Suggest something unique to try!</div>
+              <div className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2">Quick 10-min snack?</div>
+            </div>
+          </div>
+        </div>)
+        : null }
+
         <div className="flex space-x-4 max-w-4xl mx-auto">
           <input
             type="text"

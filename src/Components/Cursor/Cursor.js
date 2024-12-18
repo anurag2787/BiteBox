@@ -8,15 +8,15 @@ const Cursor = () => {
   const requestRef = useRef();
 
   const colors = [
-    "#FFFF00",  // Yellow
+    "#F59E0B",  // Amber (Yellow-500 in Tailwind)
+  "#FDE047",  // Lemon Yellow (Yellow-300 in Tailwind)
+  "#FCD34D",  // Soft Yellow (Yellow-400 in Tailwind)
+  "#FBBF24",  // Golden Yellow (Yellow-600 in Tailwind)
+  "#F9A825",  // Sunflower Yellow
   "#FFD700",  // Gold
-  "#FFC107",  // Amber
+  "#FFC107",  // Amber Gold
   "#FFECB3",  // Light Amber
-  "#FFF9C4",  // Lemon Chiffon
-  "#FFEB3B",  // Bright Yellow
-  "#FFF176",  // Pale Yellow
-  "#FFF8E1",  // Light Butter Yellow
-  "#FFFFE0",  // Light Yellow (repeated for smoother transition)
+  "#F59E0B",  // Amber (repeated for smoother transition)
   ];
 
   useEffect(() => {
@@ -39,7 +39,7 @@ const Cursor = () => {
       circle.style.height = '24px';
       circle.style.transition = 'background-color 0.3s ease';
       circle.style.backgroundColor = colors[index % colors.length];
-      circle.style.zIndex = '100';
+      circle.style.zIndex = '999';
 
       
       // Custom properties to track position
