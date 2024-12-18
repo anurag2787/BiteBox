@@ -14,7 +14,7 @@ function Chat() {
   const [history, setHistory] = useState([]);
   const chatEndRef = useRef(null);
   const historyRef = useRef([]);
-  const [quickoption,setQuickoption] = useState(true)
+  const [quickoption, setQuickoption] = useState(true)
 
   // More conversational and flexible system prompts
   const SYSTEM_PROMPTS = [
@@ -113,27 +113,42 @@ function Chat() {
     generateInitial();
   }, []);
 
-  async function handleSendMessage() {
+  
+
+  //function for quick option
+  async function handleDivClick(message) {
+    // Set the clicked message to input
+    // console.log(message);  
+    setInput(message);
+    // setQuickoption(false);
+    await handleSendMessage(message);
+    
+  }
+
+  async function handleSendMessage(inputMessage = null) {
+    const messageToSend = inputMessage || input; // Use inputMessage if provided, otherwise use the current input
+    setQuickoption(false);
     if (!ready) {
       alert("Please wait while the AI is preparing...");
       return;
     }
-    if (!input.trim()) {
+  
+    if (!messageToSend.trim()) {
       alert("Please enter a message before sending.");
       return;
     }
-
+  
     setAnswer("");
-
-    // More conversational prompt
+  
+    // Generate the conversational prompt
     const prompt = `Conversation Context:
-${history
-        .map((entry) => `${entry.role}: ${entry.text}`)
-        .join("\n")}
-User: ${input}
-
-Respond in a friendly, natural manner. Use markdown for formatting if needed. Add emojis to make the conversation engaging.`;
-
+  ${history
+      .map((entry) => `${entry.role}: ${entry.text}`)
+      .join("\n")}
+  User: ${messageToSend}
+  
+  Respond in a friendly, natural manner. Use markdown for formatting if needed. Add emojis to make the conversation engaging.`;
+  
     try {
       const response = await axios({
         url: `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`,
@@ -143,23 +158,24 @@ Respond in a friendly, natural manner. Use markdown for formatting if needed. Ad
           contents: [{ role: "user", parts: [{ text: prompt }] }],
         },
       });
-
+  
       const botResponse = cleanResponse(
         response.data.candidates[0].content.parts[0].text
       );
-      setAnswer("");
       setHistory((prevHistory) => [
         ...prevHistory,
-        { role: "user", text: input },
+        { role: "user", text: messageToSend },
         { role: "bot", text: botResponse },
       ]);
-      setInput("");
+  
+      setInput(""); // Clear the input after sending the message
       chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     } catch (error) {
       setAnswer("An error occurred. Please try again.");
-      alert('Something went wrong. Please rephrase your request.');
+      alert("Something went wrong. Please rephrase your request.");
     }
   }
+
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -270,23 +286,48 @@ Respond in a friendly, natural manner. Use markdown for formatting if needed. Ad
 
       {/* Input Area */}
       <div className="bg-white p-4 border-t shadow-inner">
-        { quickoption ? (<div className="text-black flex flex-col justify-center items-center">
+        {quickoption ? (<div className="text-black flex flex-col justify-center items-center">
           <div className="">
             <div className="flex items-center justify-center">
               <h2 className="font-bold text-xl mb-3">Feeling Hungry? Here Are Some Quick Options! 🍔🍕</h2>
             </div>
             <div className="flex items-center justify-center space-x-3 ">
-              <div className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2">Feeling spicy 🌶️. Any ideas?</div>
-              <div className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2">Got rice and veggies. What to cook?</div>
-              <div className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2">Pasta and tomatoes—what’s easy?</div>
+              <div
+                className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2"
+                onClick={() => handleDivClick("Feeling spicy 🌶️. Any ideas?")}
+              >
+                Feeling spicy 🌶️. Any ideas?
+              </div>
+              <div
+                className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2"
+                onClick={() => handleDivClick("Got rice and veggies. What to cook?")}
+              >
+                Got rice and veggies. What to cook?
+              </div>
+              <div
+                className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2"
+                onClick={() => handleDivClick("Pasta and tomatoes—what’s easy?")}
+              >
+                Pasta and tomatoes—what’s easy?
+              </div>
             </div>
             <div className="flex items-center justify-center space-x-3 mt-3 mb-4">
-              <div className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2">Suggest something unique to try!</div>
-              <div className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2">Quick 10-min snack?</div>
+              <div
+                className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2"
+                onClick={() => handleDivClick("Suggest something unique to try!")}
+              >
+                Suggest something unique to try!
+              </div>
+              <div
+                className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2"
+                onClick={() => handleDivClick("Quick 10-min snack?")}
+              >
+                Quick 10-min snack?
+              </div>
             </div>
           </div>
         </div>)
-        : null }
+          : null}
 
         <div className="flex space-x-4 max-w-4xl mx-auto">
           <input
@@ -295,7 +336,7 @@ Respond in a friendly, natural manner. Use markdown for formatting if needed. Ad
             placeholder="Ask me anything about food, cooking, or just chat! 🍽️"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+            onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
           />
           <button
             onClick={handleSendMessage}
