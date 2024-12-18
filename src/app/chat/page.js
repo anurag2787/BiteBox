@@ -15,6 +15,8 @@ function Chat() {
   const chatEndRef = useRef(null);
   const historyRef = useRef([]);
   const [quickoption, setQuickoption] = useState(true)
+  const [chatbotheader, setChatbotheader] = useState(true)
+  const [count, setCount] = useState(0);
 
   // More conversational and flexible system prompts
   const SYSTEM_PROMPTS = [
@@ -113,7 +115,7 @@ function Chat() {
     generateInitial();
   }, []);
 
-  
+
 
   //function for quick option
   async function handleDivClick(message) {
@@ -122,33 +124,37 @@ function Chat() {
     setInput(message);
     // setQuickoption(false);
     await handleSendMessage(message);
-    
+
   }
 
   async function handleSendMessage(inputMessage = null) {
-    const messageToSend = inputMessage || input; // Use inputMessage if provided, otherwise use the current input
-    setQuickoption(false);
+    setCount(count+1);
+    // console.log(count);
+    const messageToSend = (inputMessage || input || "").toString();    setQuickoption(false);
     if (!ready) {
       alert("Please wait while the AI is preparing...");
       return;
     }
-  
+
     if (!messageToSend.trim()) {
       alert("Please enter a message before sending.");
       return;
     }
-  
+
     setAnswer("");
-  
+    if (count == 1) {
+      setChatbotheader(false)
+    }
+
     // Generate the conversational prompt
     const prompt = `Conversation Context:
   ${history
-      .map((entry) => `${entry.role}: ${entry.text}`)
-      .join("\n")}
+        .map((entry) => `${entry.role}: ${entry.text}`)
+        .join("\n")}
   User: ${messageToSend}
   
   Respond in a friendly, natural manner. Use markdown for formatting if needed. Add emojis to make the conversation engaging.`;
-  
+
     try {
       const response = await axios({
         url: `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`,
@@ -158,7 +164,7 @@ function Chat() {
           contents: [{ role: "user", parts: [{ text: prompt }] }],
         },
       });
-  
+
       const botResponse = cleanResponse(
         response.data.candidates[0].content.parts[0].text
       );
@@ -167,7 +173,7 @@ function Chat() {
         { role: "user", text: messageToSend },
         { role: "bot", text: botResponse },
       ]);
-  
+
       setInput(""); // Clear the input after sending the message
       chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
     } catch (error) {
@@ -246,15 +252,17 @@ function Chat() {
   return (
     <div className="w-full h-[92vh] flex flex-col bg-gray-100 relative">
       {/* Header */}
-      <div className="fixed w-[80vh] z-50">
-        <header className="bg-emerald-600 text-white p-4 pr-10 pl-10 shadow-md flex justify-between items-center w-[80%] mx-auto mt-3 mb-6 rounded-full">
-          <div>
-            <h1 className="text-2xl font-bold">BiteBox AI</h1>
-            <p className="text-sm">Your Culinary Companion</p>
-          </div>
-          <div className="text-sm text-white/80">Powered by Gemini</div>
-        </header>
-      </div>
+      {chatbotheader ?
+        (<div className="fixed w-[80vh] z-50">
+          <header className="bg-emerald-600 text-white p-4 pr-10 pl-10 shadow-md flex justify-between items-center w-[80%] mx-auto mt-3 mb-6 rounded-full">
+            <div>
+              <h1 className="text-2xl font-bold">BiteBox AI</h1>
+              <p className="text-sm">Your Culinary Companion</p>
+            </div>
+            <div className="text-sm text-white/80">Powered by Gemini</div>
+          </header>
+        </div>)
+        : null}
 
       {/* Chat Container */}
       <div className="flex-1 overflow-y-auto p-6 mt-4 space-y-4 bg-white">
@@ -296,7 +304,7 @@ function Chat() {
                 className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2"
                 onClick={() => handleDivClick("Feeling spicy 🌶️. Any ideas?")}
               >
-                Feeling spicy 🌶️. Any ideas?
+                Craving dessert 🍰. Quick recipe?
               </div>
               <div
                 className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2"
@@ -308,7 +316,7 @@ function Chat() {
                 className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2"
                 onClick={() => handleDivClick("Pasta and tomatoes—what’s easy?")}
               >
-                Pasta and tomatoes—what’s easy?
+                Dish to impress family?
               </div>
             </div>
             <div className="flex items-center justify-center space-x-3 mt-3 mb-4">
