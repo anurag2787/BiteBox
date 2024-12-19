@@ -3,7 +3,7 @@ export default function Head() {
     return (
       <>
         <title>Foodie</title>
-        <link rel="icon" href="/favicon.png" type="image/png" />
+        <link rel="icon" href="/favicon.png" type="image/png" className="rounded-full" />
       </>
     );
   }

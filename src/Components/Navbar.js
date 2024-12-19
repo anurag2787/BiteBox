@@ -11,15 +11,6 @@ const Navbar = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [imgError, setImgError] = useState(false);
 
-    const handleSignOut = async () => {
-        try {
-            await logOut();
-            setIsOpen(false);
-        } catch (error) {
-            console.error("Error signing out: ", error);
-        }
-    };
-
     const NavLink = ({ href, children }) => (
         <Link
             href={href}
@@ -136,9 +127,6 @@ const Navbar = () => {
                                         <Link href="/profile" className="block">
                                             <AuthButton>Profile</AuthButton>
                                         </Link>
-                                        <AuthButton onClick={handleSignOut}>
-                                            Sign Out
-                                        </AuthButton>
                                     </>
                                 )}
                             </div>

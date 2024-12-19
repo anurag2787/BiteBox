@@ -18,15 +18,19 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className }>
-        <AuthContextProvider>
-          <DarkModeProvider>
+      <body className={inter.className}>
+      <AuthContextProvider>
+        <DarkModeProvider>
+        <div className="relative min-h-screen">
+          <div className="sticky top-0 left-0 right-0 z-50">
           <Navbar />
-          <Ai />
+          </div>
           <Cursor />
+          <Ai />
           {children}
-          </DarkModeProvider>
-        </AuthContextProvider>
+        </div>
+        </DarkModeProvider>
+      </AuthContextProvider>
       </body>
     </html>
   );
