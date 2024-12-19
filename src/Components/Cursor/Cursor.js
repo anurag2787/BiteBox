@@ -8,15 +8,15 @@ const Cursor = () => {
   const requestRef = useRef();
 
   const colors = [
-    "#F59E0B",  // Amber (Yellow-500 in Tailwind)
-  "#FDE047",  // Lemon Yellow (Yellow-300 in Tailwind)
-  "#FCD34D",  // Soft Yellow (Yellow-400 in Tailwind)
-  "#FBBF24",  // Golden Yellow (Yellow-600 in Tailwind)
-  "#F9A825",  // Sunflower Yellow
-  "#FFD700",  // Gold
-  "#FFC107",  // Amber Gold
-  "#FFECB3",  // Light Amber
-  "#F59E0B",  // Amber (repeated for smoother transition)
+    "#4D3319", // Dark Chocolate Brown
+    "#654321", // Deep Brown
+    "#7B3F00", // Rich Chocolate
+    "#8B4513", // Saddle Brown
+    "#A0522D", // Sienna Brown
+    "#B8860B", // Dark Golden Brown
+    "#D2691E", // Chocolate
+    "#DEB887", // Burlywood (Light Brown)
+    "#4D3319"  // Dark Chocolate Brown (repeated for smoother transition)
   ];
 
   useEffect(() => {

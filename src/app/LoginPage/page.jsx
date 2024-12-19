@@ -70,7 +70,7 @@ const LoginPage = () => {
         <div className={`w-full max-w-md ${darkMode ? "bg-gray-600" : "bg-white/95"} 
           backdrop-blur-xl rounded-2xl shadow-[0_0_40px_rgba(0,0,0,0.1)] 
           p-8 space-y-6 border border-white/20
-          transition-all duration-300 ease-in-out
+          transition-all duration-300 ease-in-out z-0
           hover:shadow-[0_0_50px_rgba(0,0,0,0.15)]`}>
           <AuthForm />
         </div>

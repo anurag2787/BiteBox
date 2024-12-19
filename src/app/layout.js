@@ -4,7 +4,6 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { AuthContextProvider } from "../app/context/AuthContext";
 import { DarkModeProvider } from "./DarkModeContext";
-import Footer from "@/Components/Footer";
 import Ai from "@/Components/Ai/Ai";
 import Cursor from "@/Components/Cursor/Cursor";
 
@@ -22,12 +21,15 @@ export default function RootLayout({ children }) {
       <AuthContextProvider>
         <DarkModeProvider>
         <div className="relative min-h-screen">
-          <div className="sticky top-0 left-0 right-0 z-50">
+          <div className="top-0 left-0 right-0 ">
           <Navbar />
           </div>
+          <div className="-z-50">
+          <div className="fixed inset-0 pointer-events-none z-50">
           <Cursor />
-          <Ai />
+          </div>
           {children}
+          </div>
         </div>
         </DarkModeProvider>
       </AuthContextProvider>
