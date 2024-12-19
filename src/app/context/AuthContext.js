@@ -141,8 +141,8 @@ export const AuthContextProvider = ({ children }) => {
       emailSignIn, 
       logOut, 
       loading,
-      postRecipeWithToken,  // Share this method to post recipes with the token
-      getAuthToken,  // Share the method to get the token
+      postRecipeWithToken,  
+      getAuthToken, 
     }}>
       {children}
     </AuthContext.Provider>

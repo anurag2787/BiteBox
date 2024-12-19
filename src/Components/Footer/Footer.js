@@ -39,7 +39,7 @@ const Footer = () => {
             &copy; {new Date().getFullYear()} BiteBox . All rights reserved.
           </div>
           <div className="flex flex-row justify-center mt-4 mb-0">
-            Made with love by Mayank❤️
+            Made with ❤️ by Mayank&Anurag
           </div>
         </div>
       </Section>
