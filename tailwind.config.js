@@ -21,6 +21,11 @@ module.exports = {
           '75%': { transform: 'translateY(-30px) translateX(20px)' },
           '100%': { transform: 'translateY(0px) translateX(0px)' },
         },
+        loadingProgress: {
+          '0%': { width: '0%', marginLeft: '0%' },
+          '50%': { width: '40%', marginLeft: '60%' },
+          '100%': { width: '0%', marginLeft: '100%' }
+        },
         ping: {
           '75%, 100%': {
             transform: 'scale(2)',
@@ -38,6 +43,10 @@ module.exports = {
         slideUp: {
           '0%': { transform: 'translateY(20px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        bounce: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-4px)' }
         },
       },
       scale: {
