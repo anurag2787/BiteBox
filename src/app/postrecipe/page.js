@@ -142,12 +142,6 @@ const PostRecipePage = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-extrabold">Create Your Recipe</h1>
-        <button
-          onClick={toggleDarkMode}
-          className="p-2 rounded-full transition-all duration-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
-        >
-          {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
       </div>
 
       {/* Title Input */}

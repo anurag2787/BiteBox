@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { UserAuth } from "../app/context/AuthContext";
 import DarkModeToggle from './DarkModeToggle';
 import { Menu, X } from 'lucide-react';
+import modeToggle from './modeToggle';
 
 const Navbar = () => {
     const { user, logOut, loading } = UserAuth();
@@ -66,7 +67,8 @@ const Navbar = () => {
                             <NavLink href="/about">About</NavLink>
 
                             <div className="px-2">
-                                <DarkModeToggle />
+                                {/* <DarkModeToggle /> */}
+                                {modeToggle()}
                             </div>
                         </div>
                         
