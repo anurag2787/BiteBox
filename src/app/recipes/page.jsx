@@ -33,7 +33,7 @@ const RecipesPage = () => {
             router.push('/postrecipe');
         }
         else{
-            alert('Only Register User Can Post :)')
+            alert('Only Register User an Post :)')
             router.push('/LoginPage');
         }
         

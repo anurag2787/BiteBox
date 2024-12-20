@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useDarkMode } from '../../DarkModeContext';
+import loader from '@/Components/loader';
 
 const renderStyledContent = (content) => {
     if (!content || !content.blocks) return null;
@@ -112,11 +113,9 @@ const RecipeDetailsPage = () => {
     }
 
     if (!recipe) {
-        return (
-            <div className={`min-h-screen flex flex-col items-center justify-center ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
-                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500 mb-4"></div>
-                <p className="text-lg font-medium">Loading recipe details...</p>
-            </div>
+        return (<div>
+               {loader()}
+        </div>
         );
     }
 
