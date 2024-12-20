@@ -31,6 +31,7 @@ export default function RootLayout({ children }) {
           {children}
           </div>
         </div>
+        <Ai />
         </DarkModeProvider>
       </AuthContextProvider>
       </body>
