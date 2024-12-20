@@ -124,13 +124,15 @@ function Chat() {
     setInput(message);
     // setQuickoption(false);
     await handleSendMessage(message);
+    handleSendMessage();
 
   }
 
   async function handleSendMessage(inputMessage = null) {
     setCount(count+1);
     // console.log(count);
-    const messageToSend = (inputMessage || input || "").toString();    setQuickoption(false);
+    const messageToSend = (inputMessage || input || "").toString();    
+    setQuickoption(false);
     if (!ready) {
       alert("Please wait while the AI is preparing...");
       return;
@@ -167,7 +169,9 @@ function Chat() {
 
       const botResponse = cleanResponse(
         response.data.candidates[0].content.parts[0].text
+        
       );
+      console.log(response);
       setHistory((prevHistory) => [
         ...prevHistory,
         { role: "user", text: messageToSend },

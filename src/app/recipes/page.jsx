@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation'; // Correct API for App Directory
 import axios from 'axios';
+import { UserAuth } from '../context/AuthContext';
 
 const RecipesPage = () => {
     const [recipes, setRecipes] = useState([]);
     const router = useRouter();
+    const {user} = UserAuth();
 
     useEffect(() => {
         const fetchRecipes = async () => {
@@ -27,7 +29,14 @@ const RecipesPage = () => {
     };
 
     const handlePostRecipeClick = () => {
-        router.push('/postrecipe');
+        if(user){
+            router.push('/postrecipe');
+        }
+        else{
+            alert('Only Register User Can Post :)')
+            router.push('/LoginPage');
+        }
+        
     };
 
     return (

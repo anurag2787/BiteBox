@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import axios from 'axios';
+import { UserAuth } from "../context/AuthContext";
+import { useRouter } from 'next/navigation'; 
+
 import {
   Bold,
   Italic,
@@ -31,6 +34,11 @@ const PostRecipePage = () => {
   const [editorState, setEditorState] = useState(null);
   const [DraftModules, setDraftModules] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // user auth 
+  const {user}= UserAuth();
+  const router = useRouter();
+  
 
   const { darkMode, toggleDarkMode } = useDarkMode();
 
@@ -83,8 +91,8 @@ const PostRecipePage = () => {
     setLoading(true);
     try {
       const userDetails = {
-        username: 'TestUser', // Replace with dynamic username
-        email: 'testuser@example.com', // Replace with dynamic email
+        username: user.displayName || 'Anonymous', // Replace with dynamic username
+        email: user.email ||'Not Available', // Replace with dynamic email
       };
 
       // Post the recipe data
@@ -101,6 +109,7 @@ const PostRecipePage = () => {
       setImageUrl('');
       setCategory('');
       setEditorState(DraftModules.EditorState.createEmpty());
+      router.push('/recipes');
     } catch (error) {
       console.error('Error posting recipe:', error);
       alert('Failed to post recipe.');
