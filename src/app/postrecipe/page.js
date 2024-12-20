@@ -169,16 +169,34 @@ const PostRecipePage = () => {
       </div>
 
       {/* Category Input */}
-      <div className="mb-4">
-        <input
-          type="text"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="w-full text-lg border-b-2 border-gray-300 dark:border-gray-600 px-4 py-2 focus:border-blue-500 transition placeholder-gray-400 bg-transparent"
-          placeholder="Category (e.g., Dessert, Main Course)"
-          required
-        />
-      </div>
+     {/* Category Dropdown */}
+     <div className="mb-6">
+            <div className="relative">
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            className="appearance-none w-full text-lg px-4 py-3 rounded-lg border-2 border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 bg-white dark:bg-gray-800 cursor-pointer"
+            required
+          >
+            <option value="" disabled>Select a Category</option>
+            <option value="Appetizer">🥗 Appetizer</option>
+            <option value="Main Course">🍽️ Main Course</option>
+            <option value="Dessert">🍰 Dessert</option>
+            <option value="Breakfast">🍳 Breakfast</option>
+            <option value="Lunch">🥪 Lunch</option>
+            <option value="Dinner">🍖 Dinner</option>
+            <option value="Snack">🍿 Snack</option>
+            <option value="Beverage">🥤 Beverage</option>
+            <option value="Salad">🥬 Salad</option>
+            <option value="Soup">🥣 Soup</option>
+          </select>
+          <div className="pointer-events-none absolute right-4 top-1/2 transform -translate-y-1/2">
+            <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+            </div>
+          </div>
 
       {/* Formatting Toolbar */}
       <div className="flex flex-wrap items-center bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-600 rounded-lg p-3 space-x-2 mb-4">
