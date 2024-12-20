@@ -1,160 +1,146 @@
-'use client'
-
-import React, { useState } from 'react'
+"use client"
+import React, { useState, useEffect } from 'react'
 import Footer from '../../Components/Footer'
 import Section from '@/Components/Section'
 import Image from 'next/image'
 import { useDarkMode } from '../DarkModeContext'
-
-const menuItems = [
-  {
-    name: 'Margherita Pizza',
-    category: 'Pizza',
-    price: 'Rs12.99',
-    description: 'Classic pizza with tomato sauce, mozzarella, and basil.',
-    image:
-      'https://images.unsplash.com/photo-1598023696416-0193a0bcd302?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8TWFyZ2hlcml0YSUyMFBpenphfGVufDB8fDB8fHww',
-  },
-  {
-    name: 'Pepperoni Pizza',
-    category: 'Pizza',
-    price: 'Rs14.99',
-    description: 'Pepperoni, mozzarella, and tomato sauce.',
-    image:
-      'https://images.unsplash.com/photo-1534308983496-4fabb1a015ee?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8UGVwcGVyb25pJTIwUGl6emF8ZW58MHx8MHx8fDA%3D',
-  },
-  {
-    name: 'BBQ Chicken Pizza',
-    category: 'Pizza',
-    price: 'Rs15.99',
-    description: 'BBQ chicken, red onions, and cilantro.',
-    image:
-      'https://images.unsplash.com/photo-1528137871618-79d2761e3fd5?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fEJCUSUyMENoaWNrZW4lMjBQaXp6YXxlbnwwfHwwfHx8MA%3D%3D',
-  },
-  {
-    name: 'Veggie Pizza',
-    category: 'Pizza',
-    price: 'Rs13.99',
-    description: 'Bell peppers, olives, onions, and mushrooms.',
-    image:
-      'https://images.unsplash.com/photo-1617470702892-e01504297e84?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8VmVnZ2llJTIwUGl6emF8ZW58MHx8MHx8fDA%3D',
-  },
-  {
-    name: 'Caesar Salad',
-    category: 'Salad',
-    price: 'Rs9.99',
-    description: 'Romaine lettuce, Caesar dressing, and croutons.',
-    image: 'https://images.unsplash.com/photo-1551024601-bec78aea704b',
-  },
-  {
-    name: 'Greek Salad',
-    category: 'Salad',
-    price: 'Rs10.99',
-    description: 'Mixed greens, feta cheese, olives, and vinaigrette.',
-    image:
-      'https://images.unsplash.com/photo-1625944230945-1b7dd3b949ab?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8Z3JlZWslMjBzYWxhZHxlbnwwfHwwfHx8MA%3D%3D',
-  },
-  {
-    name: 'Spaghetti Bolognese',
-    category: 'Pasta',
-    price: 'Rs14.99',
-    description: 'Spaghetti with a rich meat sauce.',
-    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc',
-  },
-  {
-    name: 'Fettuccine Alfredo',
-    category: 'Pasta',
-    price: 'Rs13.99',
-    description: 'Fettuccine pasta with creamy Alfredo sauce.',
-    image: 'https://images.unsplash.com/photo-1551218808-94e220e084d2',
-  },
-  {
-    name: 'Chicken Parmesan',
-    category: 'Entree',
-    price: 'Rs16.99',
-    description: 'Breaded chicken breast with marinara and cheese.',
-    image:
-      'https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8Q2hpY2tlbiUyMFBhcm1lc2FufGVufDB8fDB8fHww',
-  },
-  {
-    name: 'Tiramisu',
-    category: 'Dessert',
-    price: 'Rs6.99',
-    description: 'Classic Italian dessert with coffee and mascarpone.',
-    image:
-      'https://images.unsplash.com/photo-1631206753348-db44968fd440?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fFRpcmFtaXN1fGVufDB8fDB8fHww',
-  },
-]
-
-const categories = [...new Set(menuItems.map((item) => item.category)), 'All']
+import axios from 'axios'
 
 const Menu = () => {
-  const [selectedCategory, setSelectedCategory] = useState('All')
+    const [selectedCategory, setSelectedCategory] = useState('All')
+    const [searchQuery, setSearchQuery] = useState('')
+    const [meals, setMeals] = useState([])
+    const [filteredMeals, setFilteredMeals] = useState([])
+    const { darkMode } = useDarkMode()
 
-  const filteredItems =
-    selectedCategory === 'All'
-      ? menuItems
-      : menuItems.filter((item) => item.category === selectedCategory)
+    useEffect(() => {
+        const fetchMeals = async () => {
+            try {
+                const url = searchQuery
+                    ? `https://www.themealdb.com/api/json/v1/1/search.php?s=${searchQuery}`
+                    : 'https://www.themealdb.com/api/json/v1/1/search.php?s='
 
-  const { darkMode } = useDarkMode();
+                const response = await axios.get(url)
+                const mealsData = response.data.meals || []
+                setMeals(mealsData)
+                setFilteredMeals(mealsData)
+            } catch (error) {
+                console.error('Error fetching meals:', error)
+            }
+        }
 
-  return (
-    <main className='min-h-screen flex flex-col'>
-      <Section>
-        <h1 className='text-6xl text-center font-bold tracking-wide mb-12'>
-          Our Menu
-          <span
-            className={`blinking-underscore ${
-              darkMode ? 'text-white' : 'text-black'
-            }`}
-          >
-            _
-          </span>
-        </h1>
-        <div className='flex justify-center mb-8'>
-          {categories.map((category) => (
-            <button
-              key={category}
-              className={`px-4 py-2 rounded-full mr-2 ${
-                selectedCategory === category
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-              onClick={() => setSelectedCategory(category)}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-          {filteredItems.map((item, index) => (
-            <div
-              key={index}
-              className='bg-gray-300 rounded-lg shadow-lg overflow-hidden transition duration-300 ease-in-out transform hover:scale-105'
-            >
-              <Image
-                src={item.image}
-                alt={item.name}
-                width={50}
-                height={50}
-                className='w-full h-48 object-cover'
-              />
-              <div className='p-6'>
-                <h2 className='text-2xl text-black font-bold mb-2'>
-                  {item.name}
-                </h2>
-                <p className='text-gray-700 mb-4'>{item.description}</p>
-                <p className='text-lg font-semibold text-blue-600'>
-                  {item.price}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Section>
-      <Footer />
-    </main>
-  )
+        fetchMeals()
+    }, [searchQuery])
+
+    useEffect(() => {
+        const filterItems = () => {
+            let items = meals
+            if (selectedCategory !== 'All') {
+                items = items.filter((meal) => meal.strCategory === selectedCategory)
+            }
+            setFilteredMeals(items)
+        }
+
+        filterItems()
+    }, [selectedCategory, meals])
+
+    const categories = [
+        ...new Set(meals.map((meal) => meal.strCategory)),
+        'All',
+    ]
+
+    return (
+        <main className='min-h-screen flex flex-col'>
+            <Section>
+                {/* Header Container */}
+                <div className='flex flex-col gap-6 mb-12 w-full'>
+                    {/* Title and Search Row */}
+                    <div className='flex justify-between items-center w-full'>
+                        <h1 className='text-6xl font-bold tracking-wide'>
+                            Menu
+                            <span className={`blinking-underscore ${darkMode ? 'text-white' : 'text-black'}`}>
+                                _
+                            </span>
+                        </h1>
+
+                        {/* Search Bar */}
+                        <div className='relative'>
+                            <svg
+                                className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                            >
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                            <input
+                                type="text"
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search Here"
+                                className='pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black w-64 bg-white'
+                            />
+                        </div>
+                    </div>
+
+                    {/* Categories Container */}
+                    <div className='flex justify-end'>
+                        <div className='flex flex-wrap gap-2'>
+                            {categories.map((category) => (
+                                <button
+                                    key={category}
+                                    className={`px-4 py-2 rounded-full ${
+                                        selectedCategory === category
+                                            ? 'bg-blue-600 text-white'
+                                            : 'bg-gray-200 text-gray-700'
+                                    }`}
+                                    onClick={() => setSelectedCategory(category)}
+                                >
+                                    {category}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Filtered Meals */}
+                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+                    {filteredMeals.length === 0 ? (
+                        <div className='h-[28vh] w-full'>
+                        <h1 className='text-center text-4xl font-bold ml-5 text-red-500'>
+                            Oops! No Recipe Found
+                        </h1>
+                    </div>
+                    
+                    ) : (
+                        filteredMeals.map((meal, index) => (
+                            <div
+                                key={index}
+                                className='bg-gray-300 rounded-lg shadow-lg overflow-hidden transition duration-300 ease-in-out transform hover:scale-105'
+                            >
+                                <Image
+                                    src={meal.strMealThumb}
+                                    alt={meal.strMeal}
+                                    width={50}
+                                    height={50}
+                                    className='w-full h-48 object-cover'
+                                />
+                                <div className='p-6'>
+                                    <h2 className='text-2xl text-black font-bold mb-2'>{meal.strMeal}</h2>
+                                    <p className='text-gray-700 mb-4'>{meal.strInstructions.slice(0, 100)}...</p>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </Section>
+            <Footer />
+        </main>
+    )
 }
 
 export default Menu

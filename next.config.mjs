@@ -3,8 +3,16 @@ const nextConfig = {
 
     // next.config.js
     images: {
-      domains: ['images.unsplash.com','ih0.redbubble.net'],
-      
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: '**',
+        },
+        {
+          protocol: 'https',
+          hostname: '**',
+        },
+      ],
     },
     trailingSlash: true,
     reactStrictMode: false,
