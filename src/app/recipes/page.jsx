@@ -27,20 +27,29 @@ const RecipesPage = () => {
     fetchRecipes();
   }, []);
 
-  const handleRecipeClick = (recipe) => {
-    const query = encodeURIComponent(JSON.stringify(recipe));
-    router.push(`/recipes/view?data=${query}`);
-  };
+ 
 
-  const handlePostRecipeClick = () => {
-    if(user){
+    const handleRecipeClick = (recipe) => {
+      router.push(`/view?id=${encodeURIComponent(recipe._id)}`);
+    };
+  
+  
+
+const handlePostRecipeClick = async () => {
+    try {
+        // Wait for 3 seconds to check user status
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        
+        if (user) {
             router.push('/postrecipe');
-        }
-        else{
-            alert('Only Register User an Post :)')
+        } else {
+            alert('Only Registered Users can Post :)');
             router.push('/LoginPage');
         }
-  };
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
 
   return (
     <div className="container mx-auto p-4">
