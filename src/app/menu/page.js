@@ -5,6 +5,9 @@ import Section from '@/Components/Section'
 import Image from 'next/image'
 import { useDarkMode } from '../DarkModeContext'
 import axios from 'axios'
+import { useRouter } from "next/navigation"; // Correct API for App Directory
+
+
 
 const Menu = () => {
     const [selectedCategory, setSelectedCategory] = useState('All')
@@ -12,6 +15,11 @@ const Menu = () => {
     const [meals, setMeals] = useState([])
     const [filteredMeals, setFilteredMeals] = useState([])
     const { darkMode } = useDarkMode()
+    const router = useRouter();
+    
+    const handleinstructionpage = (meal) => {
+        router.push(`/menuview?id=${encodeURIComponent(meal.idMeal)}`);
+      };
 
     useEffect(() => {
         const fetchMeals = async () => {
@@ -93,11 +101,10 @@ const Menu = () => {
                             {categories.map((category) => (
                                 <button
                                     key={category}
-                                    className={`px-4 py-2 rounded-full ${
-                                        selectedCategory === category
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-200 text-gray-700'
-                                    }`}
+                                    className={`px-4 py-2 rounded-full ${selectedCategory === category
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-200 text-gray-700'
+                                        }`}
                                     onClick={() => setSelectedCategory(category)}
                                 >
                                     {category}
@@ -111,11 +118,11 @@ const Menu = () => {
                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
                     {filteredMeals.length === 0 ? (
                         <div className='h-[28vh] w-full'>
-                        <h1 className='text-center text-4xl font-bold ml-5 text-red-500'>
-                            Oops! No Recipe Found
-                        </h1>
-                    </div>
-                    
+                            <h1 className='text-center text-4xl font-bold ml-5 text-red-500'>
+                                Oops! No Recipe Found
+                            </h1>
+                        </div>
+
                     ) : (
                         filteredMeals.map((meal, index) => (
                             <div
@@ -130,8 +137,13 @@ const Menu = () => {
                                     className='w-full h-48 object-cover'
                                 />
                                 <div className='p-6'>
-                                    <h2 className='text-2xl text-black font-bold mb-2'>{meal.strMeal}</h2>
-                                    <p className='text-gray-700 mb-4'>{meal.strInstructions.slice(0, 100)}...</p>
+                                    <h2 className='text-2xl text-black font-bold'>{meal.strMeal}</h2>
+                                    <p className='text-gray-700 '>{meal.strInstructions.slice(0, 100)}...</p>
+                                </div>
+                                <div className='mb-4 flex justify-center items-center'>
+                                    
+                                        <button onClick={() => handleinstructionpage(meal)} className='w-32 h-10 bg-yellow-400 text-gray-600 rounded-full hover:bg-yellow-500 animation hover:font-semibold'>Recipe</button>
+                                    
                                 </div>
                             </div>
                         ))
