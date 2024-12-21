@@ -91,7 +91,7 @@ function Page() {
                   className="w-full aspect-video"
                 />
               ) : (
-                nul
+                null
               )}
             </div>
           </div>

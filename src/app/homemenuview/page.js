@@ -8,7 +8,6 @@ import hrecipes from '../../lib/Homepagerecipe.json';
 function Page() {
   const searchParams = useSearchParams();
   const [id, setId] = useState(null);
-  const [mealDetails, setMealDetails] = useState(null);
   const { darkMode } = useDarkMode();
 
   // Extract `id` from the query parameters

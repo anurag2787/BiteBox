@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
@@ -76,6 +76,14 @@ const RecipeDetailsPage = () => {
   const [isLiked, setIsLiked] = useState(false);
   const { darkMode } = useDarkMode();
 
+  // Extract YouTube ID correctly
+  const extractYouTubeId = (url) => {
+    if (!url) return null;
+    const regex = /(?:youtube\.com\/(?:[^\/\n\s]*\/\S+\/|\S+\/|\S+\/v=|v\/|e(?:mbed)?\/|watch\?v=|embed\/v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+    const match = url.match(regex);
+    return match ? match[1] : null;
+  };
+
   useEffect(() => {
     const id = searchParams.get("id");
 
@@ -104,9 +112,9 @@ const RecipeDetailsPage = () => {
 
     try {
       await axios.post(`http://localhost:5000/api/recipes/${recipe._id}/like`);
-      setRecipe(prev => ({
+      setRecipe((prev) => ({
         ...prev,
-        likes: prev.likes + 1
+        likes: prev.likes + 1,
       }));
       setIsLiked(true);
     } catch (err) {
@@ -116,9 +124,11 @@ const RecipeDetailsPage = () => {
 
   if (error) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${
-        darkMode ? "bg-gray-900 text-white" : "bg-white text-black"
-      }`}>
+      <div
+        className={`min-h-screen flex items-center justify-center ${
+          darkMode ? "bg-gray-900 text-white" : "bg-white text-black"
+        }`}
+      >
         <p className="text-red-500 text-xl font-semibold">{error}</p>
       </div>
     );
@@ -128,19 +138,22 @@ const RecipeDetailsPage = () => {
     return <div>{loader()}</div>;
   }
 
-  const parsedContent = JSON.parse(recipe.content);
+  const youtubeId = extractYouTubeId(recipe.youtube);
+  const parsedContent = recipe.content ? JSON.parse(recipe.content) : null;
   const createdDate = new Date(recipe.createdAt);
 
   return (
-    <div className={`min-h-screen w-full py-12 px-4 transition-colors duration-300 ${
-      darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
-    }`}>
+    <div
+      className={`min-h-screen w-full py-12 px-4 transition-colors duration-300 ${
+        darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
+      }`}
+    >
       <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 shadow-2xl rounded-2xl overflow-hidden transform transition-all hover:scale-[1.01]">
         <div className="relative h-[500px] w-full group">
           <img
             src={recipe.coverImage || "/placeholder-recipe.jpg"}
             alt={recipe.title}
-            className="w-full h-full object-cover "
+            className="w-full h-full object-cover"
             onError={(e) => {
               e.target.src = "/placeholder-recipe.jpg";
             }}
@@ -150,9 +163,7 @@ const RecipeDetailsPage = () => {
             <h1 className="text-5xl font-bold text-white drop-shadow-lg mb-2">
               {recipe.title}
             </h1>
-            <p className="text-gray-200 text-lg">
-              {recipe.category}
-            </p>
+            <p className="text-gray-200 text-lg">{recipe.category}</p>
           </div>
         </div>
 
@@ -173,30 +184,46 @@ const RecipeDetailsPage = () => {
                 </p>
               )}
               <p className="text-gray-500 dark:text-gray-400">
-                Posted on: {format(createdDate, 'MMMM dd, yyyy')}
+                Posted on: {format(createdDate, "MMMM dd, yyyy")}
               </p>
             </div>
-            
+
             <button
               onClick={handleLike}
               disabled={isLiked}
               className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all ${
                 isLiked
-                  ? 'bg-pink-900/20 dark:bg-pink-900/30 text-pink-500 dark:text-pink-400'
-                  : 'bg-gray-100 dark:bg-gray-700 hover:bg-pink-100 dark:hover:bg-pink-900/30 text-gray-600 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400'
+                  ? "bg-pink-900/20 dark:bg-pink-900/30 text-pink-500 dark:text-pink-400"
+                  : "bg-gray-100 dark:bg-gray-700 hover:bg-pink-100 dark:hover:bg-pink-900/30 text-gray-600 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400"
               }`}
             >
-              <Heart
-                className={`w-6 h-6 ${isLiked ? 'fill-current' : ''}`}
-              />
+              <Heart className={`w-6 h-6 ${isLiked ? "fill-current" : ""}`} />
               <span className="font-medium">{recipe.likes} likes</span>
             </button>
           </div>
           <div className="prose prose-lg dark:prose-invert max-w-none">
-            <h1 className="text-3xl font-bold text-gray-600 dark:text-gray-300 drop-shadow-lg mb-2 ">Recipe Steps :</h1> 
+            <h1 className="text-3xl font-bold text-gray-600 dark:text-gray-300 drop-shadow-lg mb-2">
+              Recipe Steps :
+            </h1>
           </div>
           <div className="prose prose-lg dark:prose-invert max-w-none">
             {renderStyledContent(parsedContent)}
+          </div>
+          <div className="p-8 space-y-8 flex justify-center items-center">
+            <div className="prose prose-lg dark:prose-invert max-w-none">
+              {youtubeId ? (
+                <iframe
+                  width="560"
+                  height="315"
+                  src={`https://www.youtube.com/embed/${youtubeId}`}
+                  title="YouTube video player"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full aspect-video"
+                />
+              ) : null}
+            </div>
           </div>
         </div>
       </div>

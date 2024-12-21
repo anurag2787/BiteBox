@@ -30,6 +30,7 @@ const PostRecipePage = () => {
   const [mounted, setMounted] = useState(false);
   const [title, setTitle] = useState('');
   const [coverImage, setImageUrl] = useState('');
+  const [youtube, setYoutube] = useState('');
   const [category, setCategory] = useState('');
   const [editorState, setEditorState] = useState(null);
   const [DraftModules, setDraftModules] = useState(null);
@@ -100,6 +101,7 @@ const PostRecipePage = () => {
         title,
         content,
         coverImage,
+        youtube,
         category,
         ...userDetails,
       });
@@ -165,6 +167,17 @@ const PostRecipePage = () => {
           className="w-full text-lg border-b-2 border-gray-300 dark:border-gray-600 px-4 py-2 focus:border-blue-500 transition placeholder-gray-400 bg-transparent"
           placeholder="Image URL"
           required
+        />
+      </div>
+
+      {/* Youtube URL Input */}
+      <div className="mb-4">
+        <input
+          type="url"
+          value={youtube}
+          onChange={(e) => setYoutube(e.target.value)}
+          className="w-full text-lg border-b-2 border-gray-300 dark:border-gray-600 px-4 py-2 focus:border-blue-500 transition placeholder-gray-400 bg-transparent"
+          placeholder="Provide Youtube Link (Optional)"
         />
       </div>
 
