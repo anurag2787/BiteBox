@@ -5,6 +5,7 @@ import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { materialDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import remarkGfm from "remark-gfm";
+import { useDarkMode } from "../DarkModeContext";
 
 function Chat() {
   const API_KEY = process.env.NEXT_PUBLIC_API_KEY;
@@ -17,6 +18,7 @@ function Chat() {
   const [quickoption, setQuickoption] = useState(true)
   const [chatbotheader, setChatbotheader] = useState(true)
   const [count, setCount] = useState(0);
+  const { darkMode } = useDarkMode()
 
   // More conversational and flexible system prompts
   const SYSTEM_PROMPTS = [
@@ -236,7 +238,7 @@ function Chat() {
       <ol className="list-decimal list-inside mb-3 pl-4 space-y-1">{children}</ol>
     ),
     p: ({ children }) => (
-      <p className=" leading-relaxed text-gray-700">{children}</p>
+      <p className=" leading-relaxed">{children}</p>
     ),
     a: ({ node, ...props }) => (
       <a
@@ -254,7 +256,7 @@ function Chat() {
   };
 
   return (
-    <div className="w-full h-[92vh] flex flex-col bg-gray-100 relative">
+    <div className={`w-full h-[92vh] flex flex-col ${darkMode ? "bg-gray-900 " : "bg-gray-100"} relative`}>
       {/* Header */}
       {chatbotheader ?
         (<div className="fixed w-[80vh] z-50">
@@ -269,7 +271,7 @@ function Chat() {
         : null}
 
       {/* Chat Container */}
-      <div className="flex-1 overflow-y-auto p-6 mt-4 space-y-4 bg-white">
+      <div className={`flex-1 overflow-y-auto p-6 mt-4 space-y-4`}>
         {history.length > 2 &&
           history.slice(4).map((message, index) => (
             <div
@@ -279,8 +281,8 @@ function Chat() {
             >
               <div
                 className={`max-w-[80%] p-4 rounded-2xl shadow-md ${message.role === "user"
-                  ? "bg-emerald-500 text-white"
-                  : "bg-gray-200 text-gray-800 border"
+                  ? `${darkMode ? "bg-emerald-700" : "bg-emerald-500"} text-white`
+                  : ` border ${darkMode ? "bg-gray-700 text-white" : "bg-gray-200 text-gray-800"}`
                   }`}
               >
                 <ReactMarkdown
@@ -297,27 +299,27 @@ function Chat() {
       </div>
 
       {/* Input Area */}
-      <div className="bg-white p-4 border-t shadow-inner">
-        {quickoption ? (<div className="text-black flex flex-col justify-center items-center">
-          <div className="">
+      <div className={`${darkMode ? "bg-gray-950 " : "bg-white border-t"} p-4 shadow-inner`}>
+        {quickoption ? (<div className={` ${darkMode ? "text-white" : "text-black"} flex flex-col justify-center items-center`}>
+          <div className="text-black">
             <div className="flex items-center justify-center">
-              <h2 className="font-bold text-xl mb-3">Feeling Hungry? Here Are Some Quick Options! 🍔🍕</h2>
+              <h2 className={`${darkMode ? "text-white" : "text-black"} font-bold text-xl mb-3`}>Feeling Hungry? Here Are Some Quick Options! 🍔🍕</h2>
             </div>
             <div className="flex items-center justify-center space-x-3 ">
               <div
-                className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2"
+                className={`border border-gray-400 ${darkMode ? "bg-gray-300 " : null} p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2`}
                 onClick={() => handleDivClick("Feeling spicy 🌶️. Any ideas?")}
               >
                 Craving dessert 🍰. Quick recipe?
               </div>
               <div
-                className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2"
+                className={`border border-gray-400 ${darkMode ? "bg-gray-300 " : null} p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2`}
                 onClick={() => handleDivClick("Got rice and veggies. What to cook?")}
               >
                 Got rice and veggies. What to cook?
               </div>
               <div
-                className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2"
+                className={`border border-gray-400 ${darkMode ? "bg-gray-300 " : null} p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2`}
                 onClick={() => handleDivClick("Pasta and tomatoes—what’s easy?")}
               >
                 Dish to impress family?
@@ -325,13 +327,13 @@ function Chat() {
             </div>
             <div className="flex items-center justify-center space-x-3 mt-3 mb-4">
               <div
-                className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2"
+                className={`border border-gray-400 ${darkMode ? "bg-gray-300 " : null} p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2`}
                 onClick={() => handleDivClick("Suggest something unique to try!")}
               >
                 Suggest something unique to try!
               </div>
               <div
-                className="border border-gray-400 p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2"
+                className={`border border-gray-400 ${darkMode ? "bg-gray-300 " : null} p-2 rounded-full transition ease-in-out hover:scale-105 hover:bg-yellow-100 hover:border-2`}
                 onClick={() => handleDivClick("Quick 10-min snack?")}
               >
                 Quick 10-min snack?
@@ -344,7 +346,7 @@ function Chat() {
         <div className="flex space-x-4 max-w-4xl mx-auto">
           <input
             type="text"
-            className="flex-1 p-3 border text-black border-gray-400 rounded-xl focus:ring-2 focus:ring-emerald-500 transition-all"
+            className="flex-1 p-3 border text-black  border-gray-400 rounded-xl focus:ring-2 focus:ring-emerald-500 transition-all"
             placeholder="Ask me anything about food, cooking, or just chat! 🍽️"
             value={input}
             onChange={(e) => setInput(e.target.value)}
