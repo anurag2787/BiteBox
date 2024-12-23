@@ -48,38 +48,44 @@ const RecipesPage = () => {
 
   const likeClick = async (e, recipeId) => {
     e.stopPropagation(); // Prevent triggering the recipe card click
+
+    if (!user) {
+      alert("Please login to like recipes");
+      return;
+    }
+
+    const userId = user.email; // Use user email as the unique userId
+    const recipe = recipes.find((recipe) => recipe._id === recipeId);
+    if (!recipe) return;
+
+    // Check if the user already liked the recipe
+    const alreadyLiked =
+      Array.isArray(recipe.likes) && recipe.likes.some((like) => like.userId === userId);
+
+    if (alreadyLiked) {
+      alert("You have already liked this recipe!");
+      return;
+    }
+
+    // Optimistically update the UI for like count and heart color
+    setRecipes((prevRecipes) =>
+      prevRecipes.map((recipe) =>
+        recipe._id === recipeId
+          ? { ...recipe, likes: [...recipe.likes, { userId }] }
+          : recipe
+      )
+    );
+
+    // Send the like request to the backend
     try {
-      if (!user) {
-        alert("Please login to like recipes");
-        return;
-      }
-
-      const userId = user.email; // Use user email as the unique userId
-
-      const recipe = recipes.find((recipe) => recipe._id === recipeId);
-      if (!recipe) return;
-
-      // Check if the user already liked the recipe
-      const alreadyLiked =
-        Array.isArray(recipe.likes) &&
-        recipe.likes.some((like) => like.userId === userId);
-
-      if (alreadyLiked) {
-        alert("You have already liked this recipe!");
-        return;
-      }
-
-      // Send the like request to the backend
       const response = await axios.put(
         `http://localhost:5000/api/recipes/${recipeId}/like`,
-        {
-          userId,
-        }
+        { userId }
       );
 
-      // Update the recipes state with the new likes
-      setRecipes(
-        recipes.map((recipe) =>
+      // Update the recipes state with the new likes after server response
+      setRecipes((prevRecipes) =>
+        prevRecipes.map((recipe) =>
           recipe._id === recipeId
             ? { ...recipe, likes: response.data.likes }
             : recipe
@@ -87,6 +93,12 @@ const RecipesPage = () => {
       );
     } catch (error) {
       console.error("Error liking recipe:", error);
+      // Revert UI change if there was an error
+      setRecipes((prevRecipes) =>
+        prevRecipes.map((recipe) =>
+          recipe._id === recipeId ? { ...recipe, likes: recipe.likes.slice(0, -1) } : recipe
+        )
+      );
     }
   };
 
@@ -105,9 +117,9 @@ const RecipesPage = () => {
 
       {/* Recipe Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {recipes.map((recipe, index) => (
+        {recipes.map((recipe) => (
           <div
-            key={index}
+            key={recipe._id}
             className="border rounded-lg p-4 cursor-pointer hover:shadow-lg"
             onClick={() => handleRecipeClick(recipe)}
           >
@@ -125,17 +137,13 @@ const RecipesPage = () => {
                   <Heart
                     fill={
                       Array.isArray(recipe.likes) &&
-                      recipe.likes.some(
-                        (like) => like.userId === user?.email
-                      )
+                      recipe.likes.some((like) => like.userId === user?.email)
                         ? "#ec4899"
                         : "none"
                     }
                     stroke={
                       Array.isArray(recipe.likes) &&
-                      recipe.likes.some(
-                        (like) => like.userId === user?.email
-                      )
+                      recipe.likes.some((like) => like.userId === user?.email)
                         ? "#ec4899"
                         : "currentColor"
                     }
