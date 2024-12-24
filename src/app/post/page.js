@@ -31,7 +31,7 @@ const PostsPage = () => {
   };
 
   const handleViewPost = (postId) => {
-    router.push(`/posts/${postId}`);
+    router.push(`/post/viewpost?id=${encodeURIComponent(postId)}`);
   };
 
   return (
