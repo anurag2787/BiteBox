@@ -6,6 +6,7 @@ import { useDarkMode } from "../DarkModeContext";
 import loader from "@/Components/loader";
 import { Heart } from "lucide-react";
 import { format } from "date-fns";
+import { UserAuth } from "../context/AuthContext"; // Ensure the correct import
 
 const renderStyledContent = (content) => {
   if (!content || !content.blocks) return null;
@@ -75,6 +76,9 @@ const RecipeDetailsPage = () => {
   const [error, setError] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const { darkMode } = useDarkMode();
+  const { user } = UserAuth(); // Access user from the AuthContext
+
+  const userId = user ? user.email : null; // Use user.email if user is authenticated
 
   // Extract YouTube ID correctly
   const extractYouTubeId = (url) => {
@@ -98,6 +102,13 @@ const RecipeDetailsPage = () => {
           `http://localhost:5000/api/recipes/${encodeURIComponent(id)}`
         );
         setRecipe(response.data);
+        // Check if user already liked the recipe
+        if (userId) {
+          const alreadyLiked =
+            Array.isArray(response.data.likes) &&
+            response.data.likes.some((like) => like.userId === userId);
+          setIsLiked(alreadyLiked); // Set initial like state
+        }
       } catch (err) {
         setError("Unable to load recipe details");
         console.error("Error fetching recipe details:", err);
@@ -105,18 +116,36 @@ const RecipeDetailsPage = () => {
     };
 
     fetchRecipe();
-  }, [searchParams]);
+  }, [searchParams, userId]);
 
   const handleLike = async () => {
-    if (!recipe || isLiked) return;
+    if (!user || !recipe) return;
+
+    const userId = user.email; // Use user email as the unique userId
+
+    // Check if the user already liked the recipe
+    const alreadyLiked =
+      Array.isArray(recipe.likes) &&
+      recipe.likes.some((like) => like.userId === userId);
+
+    if (alreadyLiked) {
+      alert("You have already liked this recipe!");
+      return; // Don't proceed if already liked
+    }
 
     try {
-      await axios.post(`http://localhost:5000/api/recipes/${recipe._id}/like`);
-      setRecipe((prev) => ({
-        ...prev,
-        likes: prev.likes + 1,
+      // Send the like request to the backend
+      const response = await axios.put(
+        `http://localhost:5000/api/recipes/${recipe._id}/like`,
+        { userId }
+      );
+
+      // Update the recipe's likes and set the liked state
+      setRecipe((prevRecipe) => ({
+        ...prevRecipe,
+        likes: [...prevRecipe.likes, { userId }] // Add the current user's like to the list
       }));
-      setIsLiked(true);
+      setIsLiked(true); // Mark as liked
     } catch (err) {
       console.error("Error liking recipe:", err);
     }
@@ -140,7 +169,13 @@ const RecipeDetailsPage = () => {
 
   const youtubeId = extractYouTubeId(recipe.youtube);
   const parsedContent = recipe.content ? JSON.parse(recipe.content) : null;
-  const createdDate = new Date(recipe.createdAt);
+  
+  // Check for valid createdAt date
+  const createdDate = recipe.createdAt ? new Date(recipe.createdAt) : new Date();
+
+  const formattedDate = createdDate instanceof Date && !isNaN(createdDate) 
+    ? format(createdDate, "MMMM dd, yyyy")
+    : "Date not available";
 
   return (
     <div
@@ -184,7 +219,7 @@ const RecipeDetailsPage = () => {
                 </p>
               )}
               <p className="text-gray-500 dark:text-gray-400">
-                Posted on: {format(createdDate, "MMMM dd, yyyy")}
+                Posted on: {formattedDate}
               </p>
             </div>
 
@@ -198,33 +233,27 @@ const RecipeDetailsPage = () => {
               }`}
             >
               <Heart className={`w-6 h-6 ${isLiked ? "fill-current" : ""}`} />
-              <span className="font-medium">{recipe.likes} likes</span>
+              <span className="font-medium">{recipe.likes.length} likes</span>
             </button>
           </div>
           <div className="prose prose-lg dark:prose-invert max-w-none">
-            <h1 className="text-3xl font-bold text-gray-600 dark:text-gray-300 drop-shadow-lg mb-2">
-              Recipe Steps :
-            </h1>
-          </div>
-          <div className="prose prose-lg dark:prose-invert max-w-none">
+            <h1 className="text-4xl font-bold">Instructions</h1>
             {renderStyledContent(parsedContent)}
           </div>
-          <div className="p-8 space-y-8 flex justify-center items-center">
-            <div className="prose prose-lg dark:prose-invert max-w-none">
-              {youtubeId ? (
+          {youtubeId && (
+            <div className="mt-8">
+              <h2 className="text-3xl font-semibold">Watch Recipe Video</h2>
+              <div className="aspect-w-16 aspect-h-9 h-96 mt-4">
                 <iframe
-                  width="560"
-                  height="315"
                   src={`https://www.youtube.com/embed/${youtubeId}`}
-                  title="YouTube video player"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  className="w-full aspect-video"
-                />
-              ) : null}
+                  className="w-full h-full rounded-lg shadow-lg"
+                ></iframe>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
