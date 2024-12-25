@@ -108,6 +108,20 @@ export default function Home() {
       <Section>
         <CustomerReviewCarousel />
       </Section>
+      <Section>
+      <div className={`flex flex-col items-center justify-center mx-auto w-1/2 p-6 ${
+      darkMode ? 'bg-gray-700 text-white' : 'bg-slate-200 text-black'
+      } rounded-xl shadow-md mb-8`}>
+      <h3 className="text-2xl md:text-3xl font-bold mb-3">Enjoyed our service?</h3>
+      <p className="text-lg mb-4">Share your experience with us!</p>
+      <button 
+        onClick={() => window.location.href = '/custoratings'} 
+        className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg transition duration-300 transform hover:scale-105"
+      >
+        Rate Us
+      </button>
+      </div>
+      </Section>
 
       <Footer />
     </main>
