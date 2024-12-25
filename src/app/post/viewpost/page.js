@@ -200,7 +200,7 @@ const PostDetailsPage = () => {
                 </div>
               </div>
               <div>
-                <h2 className="font-semibold text-lg">{post.user}</h2>
+                <h2 className="font-semibold text-lg">{post.username || post.user}</h2>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <Clock className="w-4 h-4" />
                   <span>{formattedDate}</span>

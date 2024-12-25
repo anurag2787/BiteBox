@@ -25,14 +25,17 @@ function page() {
       alert('All fields are required!');
       return;
     }
-
+    
     setLoading(true);
     try {
+      console.log(user.displayName);
       const userDetails = {
+        username: user.displayName,
         userId: user.uid
         
       };
-
+      
+      console.log("UserDetails object:", userDetails); 
       const response = await axios.post('http://localhost:5000/api/posts/', {
         title,
         content,
