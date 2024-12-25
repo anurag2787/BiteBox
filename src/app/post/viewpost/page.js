@@ -177,7 +177,7 @@ const PostDetailsPage = () => {
   }
 
   if (!post) {
-    return <div className="min-h-screen flex items-center justify-center">{loader()}</div>;
+    return <div>{loader()}</div>;
   }
 
   const formattedDate = post.createdAt
