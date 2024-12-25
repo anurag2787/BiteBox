@@ -46,18 +46,25 @@ const PostDetailsPage = () => {
     }
   }, []);
 
-  const handleShare = () => {
-    const currentUrl = window.location.href; // Get the current page URL
+  const handleShare = (id) => {
+    const currentUrl = window.location.href + `viewpost/?id=${id}`;
 
-    if (shareSupported) {
+    if (navigator.share) {
       navigator.share({
-        title: document.title, // Title of the page
-        url: currentUrl, // URL of the page
+        title: document.title,
+        url: currentUrl,
       })
-        .then(() => console.log('Share successful'))
-        .catch((error) => console.error('Error sharing:', error));
+        .then(() => console.log("Share successful"))
+        .catch((error) => console.error("Error sharing:", error));
     } else {
-      alert('Sharing is not supported in your browser.');
+      // Fallback for unsupported browsers
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(currentUrl)
+          .then(() => alert("URL copied to clipboard."))
+          .catch((error) => console.error("Clipboard error:", error));
+      } else {
+        alert(`Sharing is not supported in your browser. Copy this URL: ${currentUrl}`);
+      }
     }
   };
 
