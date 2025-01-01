@@ -1,24 +1,13 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { useDarkMode } from "../../DarkModeContext";
 import { UserAuth } from "../../context/AuthContext";
-import { 
-  Video, 
-  Mic,
-  MicOff,
-  Camera,
-  CameraOff,
-  Settings,
-  Heart,
-  Send
-} from "lucide-react";
-import { Room, VideoTrack } from "livekit-client";
+import { Video, Mic, MicOff, Camera, CameraOff, Settings, Heart, Send, X } from "lucide-react";
 
 const StartNewLiveStream = () => {
   const { darkMode } = useDarkMode();
   const { user } = UserAuth();
-  const [room, setRoom] = useState(null);
   const [streamId, setStreamId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [streamData, setStreamData] = useState({
@@ -26,38 +15,33 @@ const StartNewLiveStream = () => {
     description: "",
     thumbnail: "",
   });
-  const [localParticipant, setLocalParticipant] = useState(null);
   const [isMicEnabled, setIsMicEnabled] = useState(true);
   const [isCameraEnabled, setIsCameraEnabled] = useState(true);
   const [isStreamStarted, setIsStreamStarted] = useState(false);
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
   const [likes, setLikes] = useState(0);
-
-  const initializeLiveKit = async (streamId) => {
-    try {
-      const room = new Room({
-        adaptiveStream: true,
-        dynacast: true,
-      });
-
-      await room.connect(process.env.NEXT_PUBLIC_LIVEKIT_URL, streamId);
-      setRoom(room);
-      setLocalParticipant(room.localParticipant);
-
-      // Enable initial media
-      await room.localParticipant.setCameraEnabled(true);
-      await room.localParticipant.setMicrophoneEnabled(true);
-    } catch (err) {
-      console.error("Failed to initialize LiveKit:", err);
-    }
-  };
+  const [hasLiked, setHasLiked] = useState(false);
+  
+  const localVideoRef = useRef(null);
+  const mediaStreamRef = useRef(null);
 
   const handleStartStream = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
+      // Request permissions first
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true
+      });
+      
+      mediaStreamRef.current = stream;
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = stream;
+      }
+
       const response = await axios.post("http://localhost:5000/api/streams", {
         userId: user.email,
         username: user.email,
@@ -66,31 +50,49 @@ const StartNewLiveStream = () => {
         thumbnail: streamData.thumbnail,
       });
 
-      const newStreamId = response.data.stream._id;
-      setStreamId(newStreamId);
-      await initializeLiveKit(newStreamId);
+      setStreamId(response.data.stream._id);
       setIsStreamStarted(true);
-      console.log("Share this link to join:", `http://localhost:3000/streams/joinlivestream/?id=${newStreamId}`);
     } catch (err) {
       console.error("Failed to start stream:", err);
+      alert("Failed to access camera/microphone. Please check permissions.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const toggleMicrophone = async () => {
-    if (localParticipant) {
-      const enabled = !isMicEnabled;
-      await localParticipant.setMicrophoneEnabled(enabled);
-      setIsMicEnabled(enabled);
+  const handleEndStream = async () => {
+    try {
+      await axios.put(`http://localhost:5000/api/streams/${streamId}/end`);
+      
+      // Stop all tracks
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
+      setIsStreamStarted(false);
+      window.location.href = '/'; // Redirect to home page
+    } catch (err) {
+      console.error("Failed to end stream:", err);
     }
   };
 
-  const toggleCamera = async () => {
-    if (localParticipant) {
-      const enabled = !isCameraEnabled;
-      await localParticipant.setCameraEnabled(enabled);
-      setIsCameraEnabled(enabled);
+  const toggleMicrophone = () => {
+    if (mediaStreamRef.current) {
+      const audioTrack = mediaStreamRef.current.getAudioTracks()[0];
+      if (audioTrack) {
+        audioTrack.enabled = !isMicEnabled;
+        setIsMicEnabled(!isMicEnabled);
+      }
+    }
+  };
+
+  const toggleCamera = () => {
+    if (mediaStreamRef.current) {
+      const videoTrack = mediaStreamRef.current.getVideoTracks()[0];
+      if (videoTrack) {
+        videoTrack.enabled = !isCameraEnabled;
+        setIsCameraEnabled(!isCameraEnabled);
+      }
     }
   };
 
@@ -112,25 +114,51 @@ const StartNewLiveStream = () => {
     }
   };
 
-  React.useEffect(() => {
+  const handleLikeStream = async () => {
+    try {
+      if (!hasLiked) {
+        await axios.put(`http://localhost:5000/api/streams/${streamId}/like`, {
+          userId: user.email,
+        });
+        setLikes(prev => prev + 1);
+      } else {
+        await axios.put(`http://localhost:5000/api/streams/${streamId}/unlike`, {
+          userId: user.email,
+        });
+        setLikes(prev => prev - 1);
+      }
+      setHasLiked(!hasLiked);
+    } catch (err) {
+      console.error("Error toggling like:", err);
+    }
+  };
+
+  useEffect(() => {
+    // Fetch initial stream data if needed
+    if (streamId) {
+      axios.get(`http://localhost:5000/api/streams/${streamId}`)
+        .then(response => {
+          setComments(response.data.comments);
+          setLikes(response.data.likes.length);
+          setHasLiked(response.data.likes.some(like => like.userId === user.email));
+        })
+        .catch(console.error);
+    }
+
     return () => {
-      if (room) {
-        room.disconnect();
+      if (mediaStreamRef.current) {
+        mediaStreamRef.current.getTracks().forEach(track => track.stop());
       }
     };
-  }, [room]);
+  }, [streamId, user.email]);
 
   return (
-    <div className={`min-h-screen py-8 px-4 ${
-      darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"
-    }`}>
+    <div className={`min-h-screen py-8 px-4 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
       <div className="max-w-6xl mx-auto">
         {!isStreamStarted ? (
-          <div className={`rounded-lg shadow-lg p-8 ${
-            darkMode ? "bg-gray-800" : "bg-white"
-          }`}>
+          <div className={`rounded-lg shadow-lg p-8 ${darkMode ? "bg-gray-800" : "bg-white"}`}>
             <h1 className="text-2xl font-bold mb-6">Start New Live Stream</h1>
-            
+
             <form onSubmit={handleStartStream} className="space-y-6">
               <div className="space-y-4">
                 <div>
@@ -138,12 +166,8 @@ const StartNewLiveStream = () => {
                   <input
                     type="text"
                     value={streamData.title}
-                    onChange={(e) => setStreamData(prev => ({...prev, title: e.target.value}))}
-                    className={`w-full p-3 rounded-lg border ${
-                      darkMode 
-                        ? "bg-gray-700 border-gray-600" 
-                        : "bg-white border-gray-300"
-                    }`}
+                    onChange={(e) => setStreamData(prev => ({ ...prev, title: e.target.value }))}
+                    className={`w-full p-3 rounded-lg border ${darkMode ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}`}
                     required
                   />
                 </div>
@@ -152,12 +176,8 @@ const StartNewLiveStream = () => {
                   <label className="block text-sm font-medium mb-2">Description</label>
                   <textarea
                     value={streamData.description}
-                    onChange={(e) => setStreamData(prev => ({...prev, description: e.target.value}))}
-                    className={`w-full p-3 rounded-lg border h-32 resize-none ${
-                      darkMode 
-                        ? "bg-gray-700 border-gray-600" 
-                        : "bg-white border-gray-300"
-                    }`}
+                    onChange={(e) => setStreamData(prev => ({ ...prev, description: e.target.value }))}
+                    className={`w-full p-3 rounded-lg border h-32 resize-none ${darkMode ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}`}
                   />
                 </div>
 
@@ -166,12 +186,8 @@ const StartNewLiveStream = () => {
                   <input
                     type="text"
                     value={streamData.thumbnail}
-                    onChange={(e) => setStreamData(prev => ({...prev, thumbnail: e.target.value}))}
-                    className={`w-full p-3 rounded-lg border ${
-                      darkMode 
-                        ? "bg-gray-700 border-gray-600" 
-                        : "bg-white border-gray-300"
-                    }`}
+                    onChange={(e) => setStreamData(prev => ({ ...prev, thumbnail: e.target.value }))}
+                    className={`w-full p-3 rounded-lg border ${darkMode ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"}`}
                   />
                 </div>
               </div>
@@ -179,14 +195,10 @@ const StartNewLiveStream = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className={`w-full py-3 rounded-lg flex items-center justify-center gap-2 ${
-                  darkMode 
-                    ? "bg-blue-600 hover:bg-blue-700" 
-                    : "bg-blue-500 hover:bg-blue-600"
-                } text-white transition-colors`}
+                className="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors"
               >
                 {isLoading ? (
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
                 ) : (
                   <>
                     <Video className="w-5 h-5" />
@@ -198,106 +210,92 @@ const StartNewLiveStream = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            <div className={`rounded-lg overflow-hidden ${
-              darkMode ? "bg-gray-800" : "bg-white"
-            }`}>
+            <div className={`rounded-lg overflow-hidden ${darkMode ? "bg-gray-800" : "bg-white"}`}>
               <div className="aspect-video relative bg-black">
-                {localParticipant && (
-                  <VideoTrack
-                    participant={localParticipant}
-                    className="w-full h-full object-cover"
-                  />
-                )}
-                
+                <video
+                  ref={localVideoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover"
+                />
+
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center gap-4 px-6 py-3 rounded-full bg-black/50">
                   <button
                     onClick={toggleMicrophone}
-                    className={`p-3 rounded-full ${isMicEnabled ? 'bg-blue-500' : 'bg-red-500'}`}
+                    className={`p-3 rounded-full ${isMicEnabled ? "bg-blue-500" : "bg-red-500"}`}
                   >
                     {isMicEnabled ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
                   </button>
 
                   <button
                     onClick={toggleCamera}
-                    className={`p-3 rounded-full ${isCameraEnabled ? 'bg-blue-500' : 'bg-red-500'}`}
+                    className={`p-3 rounded-full ${isCameraEnabled ? "bg-blue-500" : "bg-red-500"}`}
                   >
                     {isCameraEnabled ? <Camera className="w-5 h-5" /> : <CameraOff className="w-5 h-5" />}
                   </button>
 
-                  <button className="p-3 rounded-full bg-gray-600 hover:bg-gray-700">
-                    <Settings className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className={`p-6 rounded-lg ${
-              darkMode ? "bg-gray-800" : "bg-white"
-            }`}>
-              <h1 className="text-2xl font-bold mb-2">{streamData.title}</h1>
-              <p className={`${darkMode ? "text-gray-400" : "text-gray-600"}`}>
-                {streamData.description}
-              </p>
-              <p className="mt-4 text-blue-500">
-                Share link: http://localhost:3000/streams/joinlivestream/?id={streamId}
-              </p>
-            </div>
-
-            <div className={`p-6 rounded-lg ${
-              darkMode ? "bg-gray-800" : "bg-white"
-            }`}>
-              <div className="flex items-center gap-4 mb-6">
-                <button
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-                    darkMode ? "bg-gray-700" : "bg-gray-100"
-                  }`}
-                >
-                  <Heart className="w-5 h-5" />
-                  <span>{likes}</span>
-                </button>
-              </div>
-
-              <div className="space-y-4">
-                <h2 className="text-lg font-semibold">Comments</h2>
-                
-                <div className="flex gap-4">
-                  <input
-                    type="text"
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    placeholder="Write a comment..."
-                    className={`flex-grow p-3 rounded-lg ${
-                      darkMode 
-                        ? "bg-gray-700 border-gray-600" 
-                        : "bg-white border-gray-300"
-                    } border`}
-                  />
                   <button
-                    onClick={handleAddComment}
-                    className={`px-6 rounded-lg flex items-center gap-2 ${
-                      darkMode 
-                        ? "bg-blue-600 hover:bg-blue-700" 
-                        : "bg-blue-500 hover:bg-blue-600"
-                    } text-white`}
+                    onClick={handleEndStream}
+                    className="p-3 rounded-full bg-red-500 hover:bg-red-600"
                   >
-                    <Send className="w-4 h-4" />
+                    <X className="w-5 h-5" />
                   </button>
                 </div>
+              </div>
+            </div>
 
-                <div className="space-y-4 mt-4">
-                  {comments.map((comment, index) => (
-                    <div
-                      key={comment._id || index}
-                      className={`p-4 rounded-lg ${
-                        darkMode ? "bg-gray-700" : "bg-gray-100"
-                      }`}
+            <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6`}>
+              <div className={`lg:col-span-2 space-y-6`}>
+                <div className={`p-6 rounded-lg ${darkMode ? "bg-gray-800" : "bg-white"}`}>
+                  <h1 className="text-2xl font-bold mb-2">{streamData.title}</h1>
+                  <p className={`${darkMode ? "text-gray-400" : "text-gray-600"}`}>
+                    {streamData.description}
+                  </p>
+                  <div className="mt-4 flex items-center gap-4">
+                    <button
+                      onClick={handleLikeStream}
+                      className={`p-3 rounded-full ${hasLiked ? 'bg-red-500' : 'bg-gray-500'} hover:bg-red-600 text-white`}
                     >
-                      <p className="font-medium">{comment.user}</p>
-                      <p className={darkMode ? "text-gray-300" : "text-gray-700"}>
-                        {comment.text}
-                      </p>
-                    </div>
-                  ))}
+                      <Heart className={`w-5 h-5 ${hasLiked ? 'fill-current' : ''}`} />
+                    </button>
+                    <span>{likes} likes</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className={`p-6 rounded-lg ${darkMode ? "bg-gray-800" : "bg-white"}`}>
+                <div className="flex flex-col h-[400px]">
+                  <h2 className="text-xl font-bold mb-4">Live Chat</h2>
+                  <div className="flex-1 overflow-y-auto mb-4 space-y-4">
+                    {comments.map((comment, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <div className="w-8 h-8 rounded-full bg-gray-600 flex-shrink-0" />
+                        <div>
+                          <div className="font-semibold text-sm">{comment.user}</div>
+                          <p className="text-sm break-words">{comment.text}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={commentText}
+                      onChange={(e) => setCommentText(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
+                      className={`flex-1 p-2 rounded-lg border ${
+                        darkMode ? "bg-gray-700 border-gray-600" : "bg-white border-gray-300"
+                      }`}
+                      placeholder="Type a message..."
+                    />
+                    <button
+                      onClick={handleAddComment}
+                      className="p-2 rounded-lg bg-blue-500 hover:bg-blue-600"
+                    >
+                      <Send className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
