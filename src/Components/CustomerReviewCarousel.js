@@ -22,7 +22,7 @@ const CustomerReviewCarousel = () => {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/reviews'); // Replace with your actual backend API URL
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/reviews`); // Replace with your actual backend API URL
         setReviews(response.data.data); // Assuming the reviews are in `data.data`
       } catch (error) {
         console.error('Error fetching reviews:', error);

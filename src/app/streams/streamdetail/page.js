@@ -38,7 +38,7 @@ const StreamDetailPage = () => {
 
     const fetchStream = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/streams/${streamId}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${streamId}`);
         setStream(response.data);
         setIsLiked(response.data.likes?.some(like => like.userId === userId));
         setLoading(false);
@@ -56,7 +56,7 @@ const StreamDetailPage = () => {
 
     try {
       const endpoint = isLiked ? 'unlike' : 'like';
-      await axios.put(`http://localhost:5000/api/streams/${stream._id}/${endpoint}`, {
+      await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${stream._id}/${endpoint}`, {
         userId,
       });
       
@@ -77,7 +77,7 @@ const StreamDetailPage = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/streams/${stream._id}/comment`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${stream._id}/comment`,
         { userId, text: commentText }
       );
       setStream(prevStream => ({

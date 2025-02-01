@@ -36,7 +36,7 @@ function page() {
       };
       
       console.log("UserDetails object:", userDetails); 
-      const response = await axios.post('http://localhost:5000/api/posts/', {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/posts/`, {
         title,
         content,
         thumbnail,

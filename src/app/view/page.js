@@ -99,7 +99,7 @@ const RecipeDetailsPage = () => {
     const fetchRecipe = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/recipes/${encodeURIComponent(id)}`
+          `${process.env.NEXT_PUBLIC_BACKEND_API}/api/recipes/${encodeURIComponent(id)}`
         );
         setRecipe(response.data);
         // Check if user already liked the recipe
@@ -136,7 +136,7 @@ const RecipeDetailsPage = () => {
     try {
       // Send the like request to the backend
       const response = await axios.put(
-        `http://localhost:5000/api/recipes/${recipe._id}/like`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/recipes/${recipe._id}/like`,
         { userId }
       );
 

@@ -19,8 +19,8 @@ const StreamsPage = () => {
     const fetchStreams = async () => {
       try {
         const [liveResponse, endedResponse] = await Promise.all([
-          axios.get("http://localhost:5000/api/streams/live"),
-          axios.get("http://localhost:5000/api/streams/ended")
+          axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/live`),
+          axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/ended`)
         ]);
         
         setLiveStreams(liveResponse.data);

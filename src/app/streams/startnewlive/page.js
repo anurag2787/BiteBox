@@ -42,7 +42,7 @@ const StartNewLiveStream = () => {
         localVideoRef.current.srcObject = stream;
       }
 
-      const response = await axios.post("http://localhost:5000/api/streams", {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams`, {
         userId: user.email,
         username: user.email,
         title: streamData.title,
@@ -62,7 +62,7 @@ const StartNewLiveStream = () => {
 
   const handleEndStream = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/streams/${streamId}/end`);
+      await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${streamId}/end`);
       
       // Stop all tracks
       if (mediaStreamRef.current) {
@@ -101,7 +101,7 @@ const StartNewLiveStream = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/streams/${streamId}/comment`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${streamId}/comment`,
         {
           userId: user.email,
           text: commentText,
@@ -117,12 +117,12 @@ const StartNewLiveStream = () => {
   const handleLikeStream = async () => {
     try {
       if (!hasLiked) {
-        await axios.put(`http://localhost:5000/api/streams/${streamId}/like`, {
+        await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${streamId}/like`, {
           userId: user.email,
         });
         setLikes(prev => prev + 1);
       } else {
-        await axios.put(`http://localhost:5000/api/streams/${streamId}/unlike`, {
+        await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${streamId}/unlike`, {
           userId: user.email,
         });
         setLikes(prev => prev - 1);
@@ -136,7 +136,7 @@ const StartNewLiveStream = () => {
   useEffect(() => {
     // Fetch initial stream data if needed
     if (streamId) {
-      axios.get(`http://localhost:5000/api/streams/${streamId}`)
+      axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${streamId}`)
         .then(response => {
           setComments(response.data.comments);
           setLikes(response.data.likes.length);

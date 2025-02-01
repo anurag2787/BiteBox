@@ -15,7 +15,7 @@ const RecipesPage = () => {
     const fetchRecipes = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/recipes?limit=100"
+          `${process.env.NEXT_PUBLIC_BACKEND_API}/api/recipes?limit=100`
         );
         setRecipes(response.data);
       } catch (error) {
@@ -79,7 +79,7 @@ const RecipesPage = () => {
     // Send the like request to the backend
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/recipes/${recipeId}/like`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/recipes/${recipeId}/like`,
         { userId }
       );
 
