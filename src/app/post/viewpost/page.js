@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter} from "next/navigation";
 import axios from "axios";
 import { formatDistanceToNow } from 'date-fns';
 import { useDarkMode } from "../../DarkModeContext";
@@ -24,7 +24,6 @@ import defaultImage from "@/lib/general.png";
 
 const PostDetailsPage = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [post, setPost] = useState(null);
   const [error, setError] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
@@ -67,7 +66,7 @@ const PostDetailsPage = () => {
       }
     }
   };
-
+  const searchParams = new URLSearchParams(window.location.search);
   useEffect(() => {
     const postId = searchParams.get("id");
     if (!postId) {

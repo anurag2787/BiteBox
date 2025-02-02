@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter} from "next/navigation";
 import axios from "axios";
 import { useDarkMode } from "../DarkModeContext";
 import loader from "@/Components/loader";
@@ -86,7 +86,7 @@ const renderStyledContent = (content) => {
 
 const RecipeDetailsPage = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const searchParams = new URLSearchParams(window.location.search);
   const [recipe, setRecipe] = useState(null);
   const [error, setError] = useState(null);
   const [isLiked, setIsLiked] = useState(false);

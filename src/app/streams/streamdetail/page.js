@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import { useDarkMode } from "../../DarkModeContext";
 import { 
@@ -18,7 +18,6 @@ import { UserAuth } from "../../context/AuthContext";
 
 const StreamDetailPage = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [stream, setStream] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,7 +27,7 @@ const StreamDetailPage = () => {
   const { user } = UserAuth();
 
   const userId = user ? user.email : null;
-
+  const searchParams = new URLSearchParams(window.location.search);
   useEffect(() => {
     const streamId = searchParams.get("id");
     if (!streamId) {

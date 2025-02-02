@@ -1,89 +1,117 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
 import axios from "axios";
 
 const JoinLiveStream = () => {
-  const searchParams = useSearchParams();
-  const roomId = searchParams.get("id");
+  const [roomId, setRoomId] = useState(null);
   const [peerConnection, setPeerConnection] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [videoUrl, setVideoUrl] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const remoteVideoRef = useRef(null);
+  const YOUR_WEBSERVER_URL = `${process.env.NEXT_PUBLIC_BACKEND_API}`;
 
-  const YOUR_WEBSERVER_URL = `${process.env.NEXT_PUBLIC_BACKEND_API}`; // URL of your WebRTC signaling server
-
+  // Get roomId from URL when component mounts
   useEffect(() => {
-    if (roomId) {
-      joinRoom(roomId);
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if (id) {
+      setRoomId(id);
+      setIsLoading(false);
     }
+  }, []);
+
+  // Handle WebRTC connection
+  useEffect(() => {
+    let pc = null;
+
+    const initializeConnection = async () => {
+      if (!roomId) return;
+
+      try {
+        // Join the stream
+        const { data } = await axios.post(`${YOUR_WEBSERVER_URL}/api/streams/${roomId}/join`, {
+          userId: "user123", // Example user ID
+        });
+
+        // Create and configure peer connection
+        pc = new RTCPeerConnection({
+          iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+        });
+
+        // Handle ICE candidates
+        pc.onicecandidate = async (event) => {
+          if (event.candidate) {
+            try {
+              await axios.post(`${YOUR_WEBSERVER_URL}/api/streams/${roomId}/ice-candidate`, {
+                candidate: event.candidate,
+              });
+            } catch (error) {
+              console.error("Error sending ICE candidate:", error);
+            }
+          }
+        };
+
+        // Set up remote video stream
+        pc.ontrack = (event) => {
+          if (remoteVideoRef.current && event.streams[0]) {
+            remoteVideoRef.current.srcObject = event.streams[0];
+          }
+        };
+
+        // Handle connection state changes
+        pc.onconnectionstatechange = () => {
+          if (pc.connectionState === 'connected') {
+            setIsConnected(true);
+          } else if (['disconnected', 'failed', 'closed'].includes(pc.connectionState)) {
+            setIsConnected(false);
+          }
+        };
+
+        // Set remote description and create answer
+        await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+
+        // Send answer to server
+        await axios.post(`${YOUR_WEBSERVER_URL}/api/streams/${roomId}/answer`, {
+          sdp: answer.sdp,
+          type: answer.type,
+        });
+
+        setPeerConnection(pc);
+      } catch (error) {
+        console.error("Error initializing connection:", error);
+        setIsConnected(false);
+      }
+    };
+
+    initializeConnection();
+
+    // Cleanup function
     return () => {
-      if (peerConnection) {
-        peerConnection.close();
+      if (pc) {
+        pc.close();
+        setPeerConnection(null);
+        setIsConnected(false);
       }
     };
   }, [roomId]);
 
-  const joinRoom = async (roomId) => {
-    try {
-      // Send a request to join the stream (get SDP offer from the server)
-      const { data } = await axios.post(`${YOUR_WEBSERVER_URL}/api/streams/${roomId}/join`, {
-        userId: "user123", // Example user ID (use actual user ID here)
-      });
-
-      // Create a new RTCPeerConnection and set up media streams
-      const pc = new RTCPeerConnection({
-        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
-      });
-
-      // Handle ICE candidates
-      pc.onicecandidate = (event) => {
-        if (event.candidate) {
-          // Send ICE candidate to server
-          axios.post(`${YOUR_WEBSERVER_URL}/api/streams/${roomId}/ice-candidate`, {
-            candidate: event.candidate,
-          });
-        }
-      };
-
-      // Set the remote SDP offer
-      await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
-
-      // Create an answer and send it back to the server
-      const answer = await pc.createAnswer();
-      await pc.setLocalDescription(answer);
-
-      // Send the answer to the server
-      await axios.post(`${YOUR_WEBSERVER_URL}/api/streams/${roomId}/answer`, {
-        sdp: answer.sdp,
-        type: answer.type,
-      });
-
-      // Listen for remote tracks and display them
-      pc.ontrack = (event) => {
-        const [stream] = event.streams;
-        if (remoteVideoRef.current) {
-          remoteVideoRef.current.srcObject = stream;
-        }
-      };
-
-      setPeerConnection(pc);
-      setIsConnected(true);
-    } catch (error) {
-      console.error("Error joining room:", error);
-    }
-  };
-
   const leaveRoom = async () => {
     try {
-      // Notify the server that the user is leaving the stream
-      await axios.post(`${YOUR_WEBSERVER_URL}/api/streams/${roomId}/leave`, {
-        userId: "user123", // Example user ID
-      });
+      if (roomId) {
+        await axios.post(`${YOUR_WEBSERVER_URL}/api/streams/${roomId}/leave`, {
+          userId: "user123",
+        });
+      }
 
-      // Close the WebRTC connection
       if (peerConnection) {
         peerConnection.close();
+        setPeerConnection(null);
+      }
+
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = null;
       }
 
       setIsConnected(false);
@@ -92,26 +120,52 @@ const JoinLiveStream = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  if (!roomId) {
+    return (
+      <div className="p-4 text-center text-red-500">
+        No room ID provided. Please check the URL.
+      </div>
+    );
+  }
+
   return (
     <div className="p-4">
-      {isConnected ? (
-        <div className="aspect-video bg-black rounded-lg overflow-hidden">
-          <video
-            ref={remoteVideoRef}
-            autoPlay
-            playsInline
-            className="w-full h-full object-cover"
-          />
-          <button
-            onClick={leaveRoom}
-            className="mt-4 bg-red-500 text-white py-2 px-4 rounded"
-          >
-            Leave Stream
-          </button>
-        </div>
-      ) : (
-        <div className="text-center text-gray-500">Connecting to stream...</div>
-      )}
+      <div className="max-w-4xl mx-auto">
+        {isConnected ? (
+          <div className="space-y-4">
+            <div className="aspect-video bg-black rounded-lg overflow-hidden relative">
+              <video
+                ref={remoteVideoRef}
+                autoPlay
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <button
+              onClick={leaveRoom}
+              className="w-full md:w-auto mt-4 bg-red-500 hover:bg-red-600 text-white py-2 px-6 rounded-lg transition-colors duration-200"
+            >
+              Leave Stream
+            </button>
+          </div>
+        ) : (
+          <div className="text-center p-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="animate-pulse">
+              <div className="text-gray-500 dark:text-gray-400">
+                Connecting to stream...
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
