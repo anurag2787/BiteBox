@@ -1,10 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import React, { useState, useEffect } from "react";
 import { useDarkMode } from "../DarkModeContext";
 import hrecipes from '../../lib/Homepagerecipe.json';
 
-// Separate client component for recipe content
 function RecipeDisplay({ recipe, darkMode }) {
   if (!recipe) {
     return <p>Recipe not found!</p>;
@@ -78,26 +76,22 @@ function RecipeDisplay({ recipe, darkMode }) {
   );
 }
 
-// Main component
 function Page() {
   const [recipe, setRecipe] = useState(null);
   const { darkMode } = useDarkMode();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Handle recipe loading on the client side
-    const loadRecipe = () => {
-      const mealId = searchParams?.get("id");
-      if (mealId) {
-        const foundRecipe = hrecipes.find((r) => r.id === parseInt(mealId));
-        setRecipe(foundRecipe);
-      }
-    };
+    // Get the ID from the URL using URLSearchParams
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    
+    if (id) {
+      const foundRecipe = hrecipes.find((r) => r.id === parseInt(id));
+      setRecipe(foundRecipe);
+    }
+  }, []);
 
-    loadRecipe();
-  }, [searchParams]);
-
-  // Show loading state when recipe is null
+  // Show loading state
   if (!recipe) {
     return (
       <div className="min-h-screen w-full py-12 px-4 flex items-center justify-center">
