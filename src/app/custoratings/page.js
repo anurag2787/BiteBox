@@ -28,11 +28,7 @@ const CustomerReviewForm = () => {
     }
 
     try {
-<<<<<<< HEAD
-      const response = await axios.post(`${BACKEND_URL}/api/rating/`, {
-=======
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/rating/`, {
->>>>>>> a8e2ea10ac8ef45fcf91a2d72075f4f7fcb1a218
         email: user.email,
         review,
         rating,
