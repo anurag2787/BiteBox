@@ -11,7 +11,7 @@ const JoinLiveStream = () => {
   const [videoUrl, setVideoUrl] = useState(null);
   const remoteVideoRef = useRef(null);
 
-  const YOUR_WEBSERVER_URL = 'http://localhost:5000'; // URL of your WebRTC signaling server
+  const YOUR_WEBSERVER_URL = `${process.env.NEXT_PUBLIC_BACKEND_API}`; // URL of your WebRTC signaling server
 
   useEffect(() => {
     if (roomId) {

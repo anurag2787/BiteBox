@@ -7,6 +7,7 @@ import loader from "@/Components/loader";
 import { Heart } from "lucide-react";
 import { format } from "date-fns";
 import { UserAuth } from "../context/AuthContext"; // Ensure the correct import
+import Image from "next/image";
 
 const renderStyledContent = (content) => {
   if (!content || !content.blocks) return null;
@@ -14,28 +15,42 @@ const renderStyledContent = (content) => {
   return content.blocks.map((block, index) => {
     const { text, type, inlineStyleRanges } = block;
 
+    const StyledHeaderOne = (props) => (
+      <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100" {...props} />
+    );
+    StyledHeaderOne.displayName = "StyledHeaderOne";
+
+    const StyledHeaderTwo = (props) => (
+      <h2 className="text-3xl font-semibold mb-3 text-gray-900 dark:text-gray-100" {...props} />
+    );
+    StyledHeaderTwo.displayName = "StyledHeaderTwo";
+
+    const StyledHeaderThree = (props) => (
+      <h3 className="text-2xl font-medium mb-2 text-gray-900 dark:text-gray-100" {...props} />
+    );
+    StyledHeaderThree.displayName = "StyledHeaderThree";
+
+    const StyledBlockquote = (props) => (
+      <blockquote className="border-l-4 border-gray-500 italic pl-4 text-gray-600 dark:text-gray-300" {...props} />
+    );
+    StyledBlockquote.displayName = "StyledBlockquote";
+
     let StyledBlock;
     switch (type) {
       case "header-one":
-        StyledBlock = (props) => (
-          <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100" {...props} />
-        );
+        StyledBlock = StyledHeaderOne;
         break;
       case "header-two":
-        StyledBlock = (props) => (
-          <h2 className="text-3xl font-semibold mb-3 text-gray-800 dark:text-gray-200" {...props} />
-        );
+        StyledBlock = StyledHeaderTwo;
+        break;
+      case "header-three":
+        StyledBlock = StyledHeaderThree;
         break;
       case "blockquote":
-        StyledBlock = (props) => (
-          <blockquote className="border-l-4 border-gray-400 pl-4 py-2 my-4 italic text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-r-lg" {...props} />
-        );
+        StyledBlock = StyledBlockquote;
         break;
-      case "unstyled":
       default:
-        StyledBlock = (props) => (
-          <p className="text-lg leading-relaxed mb-4 text-gray-700 dark:text-gray-300" {...props} />
-        );
+        StyledBlock = "p"; // Default to paragraph
     }
 
     let styledText = text;
@@ -99,7 +114,7 @@ const RecipeDetailsPage = () => {
     const fetchRecipe = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/recipes/${encodeURIComponent(id)}`
+          `${process.env.NEXT_PUBLIC_BACKEND_API}/api/recipes/${encodeURIComponent(id)}`
         );
         setRecipe(response.data);
         // Check if user already liked the recipe
@@ -136,7 +151,7 @@ const RecipeDetailsPage = () => {
     try {
       // Send the like request to the backend
       const response = await axios.put(
-        `http://localhost:5000/api/recipes/${recipe._id}/like`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/recipes/${recipe._id}/like`,
         { userId }
       );
 
@@ -154,9 +169,8 @@ const RecipeDetailsPage = () => {
   if (error) {
     return (
       <div
-        className={`min-h-screen flex items-center justify-center ${
-          darkMode ? "bg-gray-900 text-white" : "bg-white text-black"
-        }`}
+        className={`min-h-screen flex items-center justify-center ${darkMode ? "bg-gray-900 text-white" : "bg-white text-black"
+          }`}
       >
         <p className="text-red-500 text-xl font-semibold">{error}</p>
       </div>
@@ -169,29 +183,26 @@ const RecipeDetailsPage = () => {
 
   const youtubeId = extractYouTubeId(recipe.youtube);
   const parsedContent = recipe.content ? JSON.parse(recipe.content) : null;
-  
+
   // Check for valid createdAt date
   const createdDate = recipe.createdAt ? new Date(recipe.createdAt) : new Date();
 
-  const formattedDate = createdDate instanceof Date && !isNaN(createdDate) 
+  const formattedDate = createdDate instanceof Date && !isNaN(createdDate)
     ? format(createdDate, "MMMM dd, yyyy")
     : "Date not available";
 
   return (
     <div
-      className={`min-h-screen w-full py-12 px-4 transition-colors duration-300 ${
-        darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
-      }`}
+      className={`min-h-screen w-full py-12 px-4 transition-colors duration-300 ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
+        }`}
     >
       <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 shadow-2xl rounded-2xl overflow-hidden transform transition-all hover:scale-[1.01]">
         <div className="relative h-[500px] w-full group">
-          <img
+          <Image
             src={recipe.coverImage || "/placeholder-recipe.jpg"}
             alt={recipe.title}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              e.target.src = "/placeholder-recipe.jpg";
-            }}
+            layout="fill"
+            objectFit="cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
           <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -226,11 +237,10 @@ const RecipeDetailsPage = () => {
             <button
               onClick={handleLike}
               disabled={isLiked}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all ${
-                isLiked
-                  ? "bg-pink-900/20 dark:bg-pink-900/30 text-pink-500 dark:text-pink-400"
-                  : "bg-gray-100 dark:bg-gray-700 hover:bg-pink-100 dark:hover:bg-pink-900/30 text-gray-600 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400"
-              }`}
+              className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all ${isLiked
+                ? "bg-pink-900/20 dark:bg-pink-900/30 text-pink-500 dark:text-pink-400"
+                : "bg-gray-100 dark:bg-gray-700 hover:bg-pink-100 dark:hover:bg-pink-900/30 text-gray-600 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400"
+                }`}
             >
               <Heart className={`w-6 h-6 ${isLiked ? "fill-current" : ""}`} />
               <span className="font-medium">{recipe.likes.length} likes</span>
@@ -259,5 +269,6 @@ const RecipeDetailsPage = () => {
     </div>
   );
 };
+
 
 export default RecipeDetailsPage;

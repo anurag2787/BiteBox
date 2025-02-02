@@ -3,7 +3,7 @@ import { useDarkMode } from '../app/DarkModeContext';
 import { Moon, Sun } from 'lucide-react';
 
 
-function modeToggle() {
+function ModeToggle() {
       const { darkMode, toggleDarkMode } = useDarkMode();
 
   return (
@@ -18,4 +18,4 @@ function modeToggle() {
   )
 }
 
-export default modeToggle
+export default ModeToggle

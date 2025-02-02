@@ -77,7 +77,7 @@ const PostDetailsPage = () => {
 
     const fetchPost = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/posts/${postId}`);
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/posts/${postId}`);
         setPost(response.data);
         setIsLiked(response.data.likes?.some((like) => like.userId === userId));
       } catch (err) {
@@ -93,7 +93,7 @@ const PostDetailsPage = () => {
     if (!userId || !post) return;
 
     try {
-      await axios.put(`http://localhost:5000/api/posts/${post._id}/like`, { userId });
+      await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/posts/${post._id}/like`, { userId });
       setPost((prevPost) => ({
         ...prevPost,
         likes: [...prevPost.likes, { userId }],
@@ -109,7 +109,7 @@ const PostDetailsPage = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/posts/${post._id}/comment`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/posts/${post._id}/comment`,
         { userId, text: commentText }
       );
       setPost((prevPost) => ({
@@ -127,7 +127,7 @@ const PostDetailsPage = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:5000/api/posts/${post._id}/comment/${commentId}/reply`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/posts/${post._id}/comment/${commentId}/reply`,
         { userId, text: replyText }
       );
 
