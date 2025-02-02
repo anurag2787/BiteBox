@@ -7,6 +7,7 @@ import loader from "@/Components/loader";
 import { Heart } from "lucide-react";
 import { format } from "date-fns";
 import { UserAuth } from "../context/AuthContext"; // Ensure the correct import
+import Image from "next/image";
 
 const renderStyledContent = (content) => {
   if (!content || !content.blocks) return null;
@@ -154,9 +155,8 @@ const RecipeDetailsPage = () => {
   if (error) {
     return (
       <div
-        className={`min-h-screen flex items-center justify-center ${
-          darkMode ? "bg-gray-900 text-white" : "bg-white text-black"
-        }`}
+        className={`min-h-screen flex items-center justify-center ${darkMode ? "bg-gray-900 text-white" : "bg-white text-black"
+          }`}
       >
         <p className="text-red-500 text-xl font-semibold">{error}</p>
       </div>
@@ -169,29 +169,26 @@ const RecipeDetailsPage = () => {
 
   const youtubeId = extractYouTubeId(recipe.youtube);
   const parsedContent = recipe.content ? JSON.parse(recipe.content) : null;
-  
+
   // Check for valid createdAt date
   const createdDate = recipe.createdAt ? new Date(recipe.createdAt) : new Date();
 
-  const formattedDate = createdDate instanceof Date && !isNaN(createdDate) 
+  const formattedDate = createdDate instanceof Date && !isNaN(createdDate)
     ? format(createdDate, "MMMM dd, yyyy")
     : "Date not available";
 
   return (
     <div
-      className={`min-h-screen w-full py-12 px-4 transition-colors duration-300 ${
-        darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
-      }`}
+      className={`min-h-screen w-full py-12 px-4 transition-colors duration-300 ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
+        }`}
     >
       <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 shadow-2xl rounded-2xl overflow-hidden transform transition-all hover:scale-[1.01]">
         <div className="relative h-[500px] w-full group">
-          <img
+          <Image
             src={recipe.coverImage || "/placeholder-recipe.jpg"}
             alt={recipe.title}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              e.target.src = "/placeholder-recipe.jpg";
-            }}
+            layout="fill"
+            objectFit="cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
           <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -226,11 +223,10 @@ const RecipeDetailsPage = () => {
             <button
               onClick={handleLike}
               disabled={isLiked}
-              className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all ${
-                isLiked
+              className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all ${isLiked
                   ? "bg-pink-900/20 dark:bg-pink-900/30 text-pink-500 dark:text-pink-400"
                   : "bg-gray-100 dark:bg-gray-700 hover:bg-pink-100 dark:hover:bg-pink-900/30 text-gray-600 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400"
-              }`}
+                }`}
             >
               <Heart className={`w-6 h-6 ${isLiked ? "fill-current" : ""}`} />
               <span className="font-medium">{recipe.likes.length} likes</span>
@@ -259,5 +255,6 @@ const RecipeDetailsPage = () => {
     </div>
   );
 };
+
 
 export default RecipeDetailsPage;

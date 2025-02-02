@@ -1,12 +1,11 @@
-'use client';
-
+'use client'
 import React, { useState, useEffect } from 'react';
 import { useDarkMode } from '../../DarkModeContext'; // Import the dark mode hook
 import { UserAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import axios from 'axios';
 
-function page() {
+function CreatePost() {
   const [title, setTitle] = useState('');
   const [thumbnail, setThumbnail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -147,4 +146,4 @@ function page() {
     )
   }
 
-  export default page
+  export default CreatePost
