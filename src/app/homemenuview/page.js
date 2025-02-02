@@ -1,16 +1,14 @@
 "use client";
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useDarkMode } from "../DarkModeContext";
 import hrecipes from '../../lib/Homepagerecipe.json';
 
-function Page() {
-  const searchParams = useSearchParams();
+// Create a separate component for the recipe content
+function RecipeContent({ searchParams }) {
   const [id, setId] = useState(null);
   const { darkMode } = useDarkMode();
 
-  // Extract `id` from the query parameters
   useEffect(() => {
     const mealId = searchParams.get("id");
     if (mealId) {
@@ -18,24 +16,20 @@ function Page() {
     }
   }, [searchParams]);
 
-  // Get the recipe based on the id
   const recipe = id ? hrecipes.find((r) => r.id === parseInt(id)) : null;
 
   if (!recipe) {
     return <p>Recipe not found!</p>;
   }
 
-  // Split the instructions into steps (split on every newline `\n`)
   const instructions = recipe.instruction.split('\n');
 
-  // Extract YouTube ID correctly
   const extractYouTubeId = (url) => {
     const regex = /(?:youtube\.com\/(?:[^\/\n\s]*\/\S+\/|\S+\/|\S+\/v=|v\/|e(?:mbed)?\/|watch\?v=|embed\/v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
     const match = url.match(regex);
     return match ? match[1] : null;
   };
 
-  // Get the YouTube video ID if available
   const youtubeId = recipe.youtubeLink ? extractYouTubeId(recipe.youtubeLink) : null;
 
   return (
@@ -49,7 +43,7 @@ function Page() {
             alt={recipe.title}
             className="w-full h-full object-cover"
             onError={(e) => {
-              e.target.src = "/placeholder-recipe.jpg"; // Fallback image
+              e.target.src = "/placeholder-recipe.jpg";
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
@@ -59,7 +53,6 @@ function Page() {
             </h1>
           </div>
         </div>
-
         <div className="p-8 space-y-8">
           <div className="prose prose-lg dark:prose-invert max-w-none">
             <h1 className="text-3xl font-bold text-gray-600 dark:text-gray-300 drop-shadow-lg mb-2">
@@ -73,7 +66,6 @@ function Page() {
               ))}
             </div>
           </div>
-
           <div className="p-8 space-y-8 flex justify-center items-center">
             <div className="prose prose-lg dark:prose-invert max-w-none">
               {youtubeId ? (
@@ -93,6 +85,26 @@ function Page() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Loading component for Suspense fallback
+function LoadingRecipe() {
+  return (
+    <div className="min-h-screen w-full py-12 px-4 flex items-center justify-center">
+      <div className="animate-pulse text-lg">Loading recipe...</div>
+    </div>
+  );
+}
+
+// Main page component
+function Page() {
+  const searchParams = useSearchParams();
+
+  return (
+    <Suspense fallback={<LoadingRecipe />}>
+      <RecipeContent searchParams={searchParams} />
+    </Suspense>
   );
 }
 
