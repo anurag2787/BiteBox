@@ -15,28 +15,42 @@ const renderStyledContent = (content) => {
   return content.blocks.map((block, index) => {
     const { text, type, inlineStyleRanges } = block;
 
+    const StyledHeaderOne = (props) => (
+      <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100" {...props} />
+    );
+    StyledHeaderOne.displayName = "StyledHeaderOne";
+
+    const StyledHeaderTwo = (props) => (
+      <h2 className="text-3xl font-semibold mb-3 text-gray-900 dark:text-gray-100" {...props} />
+    );
+    StyledHeaderTwo.displayName = "StyledHeaderTwo";
+
+    const StyledHeaderThree = (props) => (
+      <h3 className="text-2xl font-medium mb-2 text-gray-900 dark:text-gray-100" {...props} />
+    );
+    StyledHeaderThree.displayName = "StyledHeaderThree";
+
+    const StyledBlockquote = (props) => (
+      <blockquote className="border-l-4 border-gray-500 italic pl-4 text-gray-600 dark:text-gray-300" {...props} />
+    );
+    StyledBlockquote.displayName = "StyledBlockquote";
+
     let StyledBlock;
     switch (type) {
       case "header-one":
-        StyledBlock = (props) => (
-          <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100" {...props} />
-        );
+        StyledBlock = StyledHeaderOne;
         break;
       case "header-two":
-        StyledBlock = (props) => (
-          <h2 className="text-3xl font-semibold mb-3 text-gray-800 dark:text-gray-200" {...props} />
-        );
+        StyledBlock = StyledHeaderTwo;
+        break;
+      case "header-three":
+        StyledBlock = StyledHeaderThree;
         break;
       case "blockquote":
-        StyledBlock = (props) => (
-          <blockquote className="border-l-4 border-gray-400 pl-4 py-2 my-4 italic text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 rounded-r-lg" {...props} />
-        );
+        StyledBlock = StyledBlockquote;
         break;
-      case "unstyled":
       default:
-        StyledBlock = (props) => (
-          <p className="text-lg leading-relaxed mb-4 text-gray-700 dark:text-gray-300" {...props} />
-        );
+        StyledBlock = "p"; // Default to paragraph
     }
 
     let styledText = text;
@@ -224,8 +238,8 @@ const RecipeDetailsPage = () => {
               onClick={handleLike}
               disabled={isLiked}
               className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all ${isLiked
-                  ? "bg-pink-900/20 dark:bg-pink-900/30 text-pink-500 dark:text-pink-400"
-                  : "bg-gray-100 dark:bg-gray-700 hover:bg-pink-100 dark:hover:bg-pink-900/30 text-gray-600 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400"
+                ? "bg-pink-900/20 dark:bg-pink-900/30 text-pink-500 dark:text-pink-400"
+                : "bg-gray-100 dark:bg-gray-700 hover:bg-pink-100 dark:hover:bg-pink-900/30 text-gray-600 dark:text-gray-300 hover:text-pink-500 dark:hover:text-pink-400"
                 }`}
             >
               <Heart className={`w-6 h-6 ${isLiked ? "fill-current" : ""}`} />
