@@ -5,6 +5,7 @@ import { UserAuth } from "../context/AuthContext";
 import { useRouter } from 'next/navigation'; // For redirection
 import axios from 'axios';
 
+const BACKEND_URL = process.env.NEXT_BACKEND_URL || 'http://localhost:5000';
 const CustomerReviewForm = () => {
   const { darkMode } = useDarkMode();
   const { user } = UserAuth();
@@ -27,7 +28,7 @@ const CustomerReviewForm = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/rating/', {
+      const response = await axios.post(`${BACKEND_URL}/api/rating/`, {
         email: user.email,
         review,
         rating,
