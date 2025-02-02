@@ -1,23 +1,11 @@
 "use client";
-import React, { useEffect, useState, Suspense } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useDarkMode } from "../DarkModeContext";
 import hrecipes from '../../lib/Homepagerecipe.json';
 
-// Create a separate component for the recipe content
-function RecipeContent({ searchParams }) {
-  const [id, setId] = useState(null);
-  const { darkMode } = useDarkMode();
-
-  useEffect(() => {
-    const mealId = searchParams.get("id");
-    if (mealId) {
-      setId(mealId);
-    }
-  }, [searchParams]);
-
-  const recipe = id ? hrecipes.find((r) => r.id === parseInt(id)) : null;
-
+// Separate client component for recipe content
+function RecipeDisplay({ recipe, darkMode }) {
   if (!recipe) {
     return <p>Recipe not found!</p>;
   }
@@ -34,7 +22,9 @@ function RecipeContent({ searchParams }) {
 
   return (
     <div
-      className={`min-h-screen w-full py-12 px-4 transition-colors duration-300 ${darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"}`}
+      className={`min-h-screen w-full py-12 px-4 transition-colors duration-300 ${
+        darkMode ? "bg-gray-900 text-gray-100" : "bg-gray-50 text-gray-900"
+      }`}
     >
       <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 shadow-2xl rounded-2xl overflow-hidden transform transition-all hover:scale-[1.01]">
         <div className="relative h-[500px] w-full group">
@@ -66,9 +56,9 @@ function RecipeContent({ searchParams }) {
               ))}
             </div>
           </div>
-          <div className="p-8 space-y-8 flex justify-center items-center">
-            <div className="prose prose-lg dark:prose-invert max-w-none">
-              {youtubeId ? (
+          {youtubeId && (
+            <div className="p-8 space-y-8 flex justify-center items-center">
+              <div className="prose prose-lg dark:prose-invert max-w-none">
                 <iframe
                   width="560"
                   height="315"
@@ -79,33 +69,44 @@ function RecipeContent({ searchParams }) {
                   allowFullScreen
                   className="w-full aspect-video"
                 />
-              ) : null}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-// Loading component for Suspense fallback
-function LoadingRecipe() {
-  return (
-    <div className="min-h-screen w-full py-12 px-4 flex items-center justify-center">
-      <div className="animate-pulse text-lg">Loading recipe...</div>
-    </div>
-  );
-}
-
-// Main page component
+// Main component
 function Page() {
+  const [recipe, setRecipe] = useState(null);
+  const { darkMode } = useDarkMode();
   const searchParams = useSearchParams();
 
-  return (
-    <Suspense fallback={<LoadingRecipe />}>
-      <RecipeContent searchParams={searchParams} />
-    </Suspense>
-  );
+  useEffect(() => {
+    // Handle recipe loading on the client side
+    const loadRecipe = () => {
+      const mealId = searchParams?.get("id");
+      if (mealId) {
+        const foundRecipe = hrecipes.find((r) => r.id === parseInt(mealId));
+        setRecipe(foundRecipe);
+      }
+    };
+
+    loadRecipe();
+  }, [searchParams]);
+
+  // Show loading state when recipe is null
+  if (!recipe) {
+    return (
+      <div className="min-h-screen w-full py-12 px-4 flex items-center justify-center">
+        <div className="text-lg">Loading recipe...</div>
+      </div>
+    );
+  }
+
+  return <RecipeDisplay recipe={recipe} darkMode={darkMode} />;
 }
 
 export default Page;
