@@ -59,7 +59,7 @@ const JoinLiveStream = () => {
                 streamId: inputStreamId
             };
 
-            const { data } = await axios.post('http://localhost:5000/consumer', payload);
+            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API}/consumer`, payload);
 
             const desc = new RTCSessionDescription(data.sdp);
             await newPeer.setRemoteDescription(desc);

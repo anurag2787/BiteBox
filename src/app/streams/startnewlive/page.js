@@ -68,7 +68,7 @@ const StartNewLiveStream = () => {
             await newPeer.setLocalDescription(offer);
 
             const payload = { sdp: newPeer.localDescription };
-            const { data } = await axios.post('http://localhost:5000/broadcast', payload);
+            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API}/broadcast`, payload);
 
             // setStreamId(data.streamId);
             console.log(data.streamId);
