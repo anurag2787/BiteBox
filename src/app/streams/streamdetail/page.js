@@ -55,7 +55,7 @@ const StreamDetailPage = () => {
 
     try {
       const endpoint = isLiked ? 'unlike' : 'like';
-      await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${stream._id}/${endpoint}`, {
+      await axios.put(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${stream.streamId}/${endpoint}`, {
         userId,
       });
       
@@ -76,7 +76,7 @@ const StreamDetailPage = () => {
 
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${stream._id}/comment`,
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${stream.streamId}/comment`,
         { userId, text: commentText }
       );
       setStream(prevStream => ({
@@ -226,7 +226,7 @@ const StreamDetailPage = () => {
               <div className="space-y-4">
                 {stream.comments?.map((comment, index) => (
                   <div
-                    key={comment._id || index}
+                    key={comment.streamId || index}
                     className={`p-4 rounded-lg ${
                       darkMode ? "bg-gray-700" : "bg-gray-50"
                     }`}

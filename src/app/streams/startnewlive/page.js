@@ -80,7 +80,7 @@ const StartNewLiveStream = () => {
               thumbnail: streamData.thumbnail,
               streamId : data.streamId,
             });
-            setStreamId(response.data.stream._id);
+            setStreamId(data.streamId);
             setPeer(newPeer);
 
             const desc = new RTCSessionDescription(data.sdp);

@@ -23,8 +23,14 @@ const StreamsPage = () => {
           axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/ended`)
         ]);
         
-        setLiveStreams(liveResponse.data);
-        setEndedStreams(endedResponse.data);
+        setLiveStreams(
+          liveResponse.data.sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))
+        );
+
+        setEndedStreams(
+          endedResponse.data.sort((a, b) => new Date(b.endedAt) - new Date(a.endedAt))
+        );
+        
         setLoading(false);
       } catch (error) {
         console.error("Error fetching streams:", error);
@@ -40,7 +46,7 @@ const StreamsPage = () => {
       if (type === "live") {
         router.push(`/streams/joinlivestream?id=${stream.streamId}`);
       } else {
-        router.push(`/streams/streamdetail?id=${stream._id}`);
+        router.push(`/streams/streamdetail?id=${stream.streamId}`);
       }
     };
 

@@ -25,6 +25,9 @@ const JoinLiveStream = () => {
       setInputStreamId(id);
       console.log(inputStreamId);
     }
+    else{
+      alert("refresh the page");
+    }
   }, [id]);
 
   async function joinStream() {
@@ -83,7 +86,7 @@ const JoinLiveStream = () => {
       setPeer(null);
     }
     setStreamId('');
-    setIsConnected(false);
+    // setIsConnected(false);
   };
 
 
