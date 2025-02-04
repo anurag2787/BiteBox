@@ -10,18 +10,21 @@ const StartNewLiveStream = () => {
   const { user } = UserAuth();
   const [streamId, setStreamId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [peer, setPeer] = useState(null);
   const [streamData, setStreamData] = useState({
     title: "",
     description: "",
     thumbnail: "",
   });
   const [isMicEnabled, setIsMicEnabled] = useState(true);
-  const [isCameraEnabled, setIsCameraEnabled] = useState(true);
+  const [isCameraOn, setIsCameraOn] = useState(false);
   const [isStreamStarted, setIsStreamStarted] = useState(false);
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
   const [likes, setLikes] = useState(0);
   const [hasLiked, setHasLiked] = useState(false);
+  const [localStream, setLocalStream] = useState(null);
+  const [live,setLive] = useState(null);
   
   const localVideoRef = useRef(null);
   const mediaStreamRef = useRef(null);
@@ -31,34 +34,63 @@ const StartNewLiveStream = () => {
     setIsLoading(true);
 
     try {
-      // Request permissions first
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true
-      });
-      
-      mediaStreamRef.current = stream;
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = stream;
-      }
-
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams`, {
-        userId: user.email,
-        username: user.email,
-        title: streamData.title,
-        description: streamData.description,
-        thumbnail: streamData.thumbnail,
-      });
-
-      setStreamId(response.data.stream._id);
       setIsStreamStarted(true);
     } catch (err) {
-      console.error("Failed to start stream:", err);
+      console.error("Failed to Load Stream:", err);
       alert("Failed to access camera/microphone. Please check permissions.");
     } finally {
       setIsLoading(false);
     }
   };
+
+  async function startBroadcast() {
+    if (!localStream) {
+        alert('Please turn on camera first');
+        return;
+    }
+
+    try {
+        const newPeer = new RTCPeerConnection({
+            iceServers: [{ urls: "stun:stun.stunprotocol.org" }]
+        });
+
+        // Handle ICE candidates
+        newPeer.onicecandidate = async (event) => {
+            if (event.candidate) {
+                // You might want to send candidates to the server if needed
+            }
+        };
+
+        localStream.getTracks().forEach(track => newPeer.addTrack(track, localStream));
+
+        newPeer.onnegotiationneeded = async () => {
+            const offer = await newPeer.createOffer();
+            await newPeer.setLocalDescription(offer);
+
+            const payload = { sdp: newPeer.localDescription };
+            const { data } = await axios.post('http://localhost:5000/broadcast', payload);
+
+            // setStreamId(data.streamId);
+            console.log(data.streamId);
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams`, {
+              userId: user.email,
+              username: user.email,
+              title: streamData.title,
+              description: streamData.description,
+              thumbnail: streamData.thumbnail,
+              streamId : data.streamId,
+            });
+            setStreamId(response.data.stream._id);
+            setPeer(newPeer);
+
+            const desc = new RTCSessionDescription(data.sdp);
+            await newPeer.setRemoteDescription(desc);
+        };
+        setLive(true)
+    } catch (error) {
+        console.error('Broadcast error:', error);
+    }
+}
 
   const handleEndStream = async () => {
     try {
@@ -68,12 +100,22 @@ const StartNewLiveStream = () => {
       if (mediaStreamRef.current) {
         mediaStreamRef.current.getTracks().forEach(track => track.stop());
       }
+      await stopBroadcast();
       
       setIsStreamStarted(false);
-      window.location.href = '/'; // Redirect to home page
+      window.location.href = '/streams'; // Redirect to home page
     } catch (err) {
       console.error("Failed to end stream:", err);
     }
+  };
+
+
+  const stopBroadcast = () => {
+    if (peer) {
+      peer.close();
+      setPeer(null);
+    }
+    setStreamId(null);
   };
 
   const toggleMicrophone = () => {
@@ -86,16 +128,36 @@ const StartNewLiveStream = () => {
     }
   };
 
-  const toggleCamera = () => {
-    if (mediaStreamRef.current) {
-      const videoTrack = mediaStreamRef.current.getVideoTracks()[0];
-      if (videoTrack) {
-        videoTrack.enabled = !isCameraEnabled;
-        setIsCameraEnabled(!isCameraEnabled);
-      }
+  const toggleCamera = async () => {
+    if (isCameraOn) {
+      stopCamera();
+    } else {
+      await handleCameraAccess();
     }
   };
 
+
+  const handleCameraAccess = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      localVideoRef.current.srcObject = stream;
+      setLocalStream(stream);
+      setIsCameraOn(true);
+    } catch (error) {
+      console.error('Camera access error:', error);
+    }
+  };
+
+  const stopCamera = () => {
+    if (localStream) {
+      const tracks = localStream.getTracks();
+      tracks.forEach(track => track.stop());
+      localVideoRef.current.srcObject = null;
+      setLocalStream(null);
+      setIsCameraOn(false);
+    }
+  };
+  
   const handleAddComment = async () => {
     if (!commentText.trim()) return;
 
@@ -133,24 +195,24 @@ const StartNewLiveStream = () => {
     }
   };
 
-  useEffect(() => {
-    // Fetch initial stream data if needed
-    if (streamId) {
-      axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${streamId}`)
-        .then(response => {
-          setComments(response.data.comments);
-          setLikes(response.data.likes.length);
-          setHasLiked(response.data.likes.some(like => like.userId === user.email));
-        })
-        .catch(console.error);
-    }
+  // useEffect(() => {
+  //   // Fetch initial stream data if needed
+  //   if (streamId) {
+  //     axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${streamId}`)
+  //       .then(response => {
+  //         setComments(response.data.comments);
+  //         setLikes(response.data.likes.length);
+  //         setHasLiked(response.data.likes.some(like => like.userId === user.email));
+  //       })
+  //       .catch(console.error);
+  //   }
 
-    return () => {
-      if (mediaStreamRef.current) {
-        mediaStreamRef.current.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [streamId, user.email]);
+  //   return () => {
+  //     if (mediaStreamRef.current) {
+  //       mediaStreamRef.current.getTracks().forEach(track => track.stop());
+  //     }
+  //   };
+  // }, [streamId, user.email]);
 
   return (
     <div className={`min-h-screen py-8 px-4 ${darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-900"}`}>
@@ -230,9 +292,9 @@ const StartNewLiveStream = () => {
 
                   <button
                     onClick={toggleCamera}
-                    className={`p-3 rounded-full ${isCameraEnabled ? "bg-blue-500" : "bg-red-500"}`}
+                    className={`p-3 rounded-full ${isCameraOn ? "bg-blue-500" : "bg-red-500"}`}
                   >
-                    {isCameraEnabled ? <Camera className="w-5 h-5" /> : <CameraOff className="w-5 h-5" />}
+                    {isCameraOn ? <Camera className="w-5 h-5" /> : <CameraOff className="w-5 h-5" />}
                   </button>
 
                   <button
@@ -244,6 +306,20 @@ const StartNewLiveStream = () => {
                 </div>
               </div>
             </div>
+            {!live ? (
+              <button
+              type="submit"
+              onClick={startBroadcast}
+              disabled={isLoading}
+              className="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+            >
+              
+                <>
+                  <Video className="w-5 h-5" />
+                  Start Streaming
+                </>
+            </button>
+            ):(null)}
 
             <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6`}>
               <div className={`lg:col-span-2 space-y-6`}>

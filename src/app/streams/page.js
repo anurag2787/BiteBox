@@ -38,7 +38,7 @@ const StreamsPage = () => {
   const StreamCard = ({ stream, type }) => {
     const handleStreamClick = () => {
       if (type === "live") {
-        router.push(`/streams/joinlivestream?id=${stream._id}`);
+        router.push(`/streams/joinlivestream?id=${stream.streamId}`);
       } else {
         router.push(`/streams/streamdetail?id=${stream._id}`);
       }
