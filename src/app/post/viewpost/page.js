@@ -46,7 +46,7 @@ const PostDetailsPage = () => {
   }, []);
 
   const handleShare = (id) => {
-    const currentUrl = window.location.href + `viewpost/?id=${id}`;
+    const currentUrl = typeof window !== "undefined" ? window.location.href + `viewpost/?id=${id}` : "";
 
     if (navigator.share) {
       navigator.share({
