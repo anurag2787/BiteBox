@@ -1,21 +1,21 @@
 "use client";
-import React, { useState, useEffect, useRef, Suspense } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { useSearchParams } from "next/navigation";
+// import { useSearchParams } from "next/navigation";
 import { useDarkMode } from "../../DarkModeContext";
 import { UserAuth } from "../../context/AuthContext";
-import { Video, Mic, MicOff, Camera, CameraOff, Settings, Heart, Send, X } from "lucide-react";
+// import { Video, Mic, MicOff, Camera, CameraOff, Settings, Heart, Send, X } from "lucide-react";
 
 const JoinLiveStream = () => {
 
   const { darkMode } = useDarkMode();
-  const { user } = UserAuth();
+  // const { user } = UserAuth();
 
   const [isConnected, setIsConnected] = useState(true);
   const [isJoined, setIsJoined] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   const videoRef = useRef(null);
-  const [streamId, setStreamId] = useState('');
+  // const [streamId, setStreamId] = useState('');
   const [inputStreamId, setInputStreamId] = useState('');
   const [peer, setPeer] = useState(null);
   useEffect(() => {
@@ -29,14 +29,14 @@ const JoinLiveStream = () => {
     }
   }, []);
   useEffect(() => {
+    const id = inputStreamId;
     if (id) {
       setInputStreamId(id);
       console.log(inputStreamId);
-    }
-    else{
+    } else {
       alert("refresh the page");
     }
-  }, [id]);
+  }, [inputStreamId]);
 
   async function joinStream() {
     setIsJoined(true);
