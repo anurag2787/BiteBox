@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { useDarkMode } from "../../DarkModeContext";
@@ -93,46 +93,48 @@ const JoinLiveStream = () => {
   return (
     <div className="p-4">
       <div className="max-w-4xl mx-auto">
-        {isConnected ? (
-          <div className="space-y-6">
-            <div className={`rounded-lg overflow-hidden ${darkMode ? "bg-gray-800" : "bg-white"}`}>
-              <div className="aspect-video relative bg-black">
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-full h-full object-cover"
-                />
+        <Suspense fallback={<div>Loading...</div>}>
+          {isConnected ? (
+            <div className="space-y-6">
+              <div className={`rounded-lg overflow-hidden ${darkMode ? "bg-gray-800" : "bg-white"}`}>
+                <div className="aspect-video relative bg-black">
+                  <video
+                    ref={videoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
-            </div>
-            {isJoined ? (
+              {isJoined ? (
+                <button
+                type="submit"
+                onClick={stopViewing}
+                className="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+              >
+                Leave Stream
+              </button>) : (
               <button
               type="submit"
-              onClick={stopViewing}
+              onClick={joinStream}
               className="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors"
             >
-              Leave Stream
-            </button>) : (
-            <button
-            type="submit"
-            onClick={joinStream}
-            className="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors"
-          >
-            Join Stream
-          </button>
-            )}
+              Join Stream
+            </button>
+              )}
 
-          </div>
-        ) : (
-          <div className="text-center p-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div className="animate-pulse">
-              <div className="text-gray-500 dark:text-gray-400">
-                Connecting to stream...
+            </div>
+          ) : (
+            <div className="text-center p-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              <div className="animate-pulse">
+                <div className="text-gray-500 dark:text-gray-400">
+                  Connecting to stream...
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </Suspense>
       </div>
     </div>
   );
