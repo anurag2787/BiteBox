@@ -27,7 +27,7 @@ const StreamDetailPage = () => {
   const { user } = UserAuth();
 
   const userId = user ? user.email : null;
-  const searchParams = new URLSearchParams(window.location.search);
+  const searchParams = new URLSearchParams(router.query);
   useEffect(() => {
     const streamId = searchParams.get("id");
     if (!streamId) {

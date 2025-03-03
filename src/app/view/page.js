@@ -86,7 +86,7 @@ const renderStyledContent = (content) => {
 
 const RecipeDetailsPage = () => {
   const router = useRouter();
-  const searchParams = new URLSearchParams(window.location.search);
+  const { searchParams } = useRouter();
   const [recipe, setRecipe] = useState(null);
   const [error, setError] = useState(null);
   const [isLiked, setIsLiked] = useState(false);

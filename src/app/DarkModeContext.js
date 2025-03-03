@@ -14,7 +14,7 @@ export const DarkModeProvider = ({ children }) => {
     if (savedMode !== null) {
       setDarkMode(savedMode === "true");
     } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const prefersDark = matchMedia("(prefers-color-scheme: dark)").matches;
       setDarkMode(prefersDark);
     }
   }, []);

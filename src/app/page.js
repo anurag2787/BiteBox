@@ -14,9 +14,12 @@ import { useDarkMode } from './DarkModeContext'
 import './globals.css' // Import the CSS file where we'll define the blinking cursor class
 import CustomerReviewCarousel from '@/Components/CustomerReviewCarousel'
 import recipes from '../lib/Homepagerecipe.json'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/navigation' 
 
 export default function Home() {
   const { darkMode } = useDarkMode()
+  const router = useRouter()
 
   // List of attributes
   const attributes = [
@@ -114,12 +117,14 @@ export default function Home() {
       } rounded-xl shadow-md mb-8`}>
       <h3 className="text-2xl md:text-3xl font-bold mb-3">Enjoyed our service?</h3>
       <p className="text-lg mb-4">Share your experience with us!</p>
+      <router>
       <button 
-        onClick={() => window.location.href = '/custoratings'} 
+        onClick={() => router.push('/custoratings')} 
         className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg transition duration-300 transform hover:scale-105"
       >
         Rate Us
       </button>
+      </router>
       </div>
       </Section>
 

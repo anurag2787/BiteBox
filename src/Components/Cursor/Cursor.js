@@ -88,7 +88,7 @@ const Cursor = () => {
     };
 
     // Start animation and add event listener
-    window.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mousemove', handleMouseMove);
     requestRef.current = requestAnimationFrame(animateCircles);
 
     // Disable default cursor
@@ -97,7 +97,7 @@ const Cursor = () => {
     // Cleanup
     return () => {
       cancelAnimationFrame(requestRef.current);
-      window.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mousemove', handleMouseMove);
       document.body.removeChild(trail);
       document.body.style.cursor = 'auto';
     };

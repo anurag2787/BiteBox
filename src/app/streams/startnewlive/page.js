@@ -4,6 +4,7 @@ import axios from "axios";
 import { useDarkMode } from "../../DarkModeContext";
 import { UserAuth } from "../../context/AuthContext";
 import { Video, Mic, MicOff, Camera, CameraOff, Settings, Heart, Send, X } from "lucide-react";
+import { useRouter } from 'next/router';
 
 const StartNewLiveStream = () => {
   const { darkMode } = useDarkMode();
@@ -103,7 +104,9 @@ const StartNewLiveStream = () => {
       await stopBroadcast();
       
       setIsStreamStarted(false);
-      window.location.href = '/streams'; // Redirect to home page
+      // Redirect to home page using Next.js router
+      const router = useRouter();
+      router.push('/streams');
     } catch (err) {
       console.error("Failed to end stream:", err);
     }

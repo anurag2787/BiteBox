@@ -12,7 +12,7 @@ function Page() {
     const fetchMealDetails = async () => {
       try {
         // Get the ID from URL using URLSearchParams
-        const urlParams = new URLSearchParams(window.location.search);
+        const urlParams = new URLSearchParams(document.location.search);
         const mealId = urlParams.get("id");
 
         if (mealId) {

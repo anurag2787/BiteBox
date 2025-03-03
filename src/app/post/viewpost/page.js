@@ -66,7 +66,8 @@ const PostDetailsPage = () => {
       }
     }
   };
-  const searchParams = new URLSearchParams(window.location.search);
+  const { search } = useRouter();
+  const searchParams = new URLSearchParams(search);
   useEffect(() => {
     const postId = searchParams.get("id");
     if (!postId) {

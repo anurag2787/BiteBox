@@ -82,7 +82,7 @@ function Page() {
 
   useEffect(() => {
     // Get the ID from the URL using URLSearchParams
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(document.location.search);
     const id = params.get('id');
     
     if (id) {
