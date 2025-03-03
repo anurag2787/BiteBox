@@ -18,8 +18,16 @@ const JoinLiveStream = () => {
   const [streamId, setStreamId] = useState('');
   const [inputStreamId, setInputStreamId] = useState('');
   const [peer, setPeer] = useState(null);
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const idFromUrl = urlParams.get("id");
+    if (idFromUrl) {
+      setInputStreamId(idFromUrl);
+      console.log(idFromUrl);
+    } else {
+      alert("refresh the page");
+    }
+  }, []);
   useEffect(() => {
     if (id) {
       setInputStreamId(id);
@@ -30,51 +38,51 @@ const JoinLiveStream = () => {
     }
   }, [id]);
 
-//   async function joinStream() {
-//     setIsJoined(true);
-//     try {
-//         const newPeer = new RTCPeerConnection({
-//             iceServers: [{ urls: "stun:stun.stunprotocol.org" }]
-//         });
+  async function joinStream() {
+    setIsJoined(true);
+    try {
+        const newPeer = new RTCPeerConnection({
+            iceServers: [{ urls: "stun:stun.stunprotocol.org" }]
+        });
 
-//         // Handle ICE candidates
-//         newPeer.onicecandidate = async (event) => {
-//             if (event.candidate) {
-//                 // You might want to send candidates to the server if needed
-//             }
-//         };
+        // Handle ICE candidates
+        newPeer.onicecandidate = async (event) => {
+            if (event.candidate) {
+                // You might want to send candidates to the server if needed
+            }
+        };
 
-//         newPeer.ontrack = (event) => {
-//             if (videoRef.current) {
-//                 videoRef.current.srcObject = event.streams[0];
-//             }
-//         };
+        newPeer.ontrack = (event) => {
+            if (videoRef.current) {
+                videoRef.current.srcObject = event.streams[0];
+            }
+        };
 
-//         newPeer.onnegotiationneeded = async () => {
-//             const offer = await newPeer.createOffer();
-//             await newPeer.setLocalDescription(offer);
+        newPeer.onnegotiationneeded = async () => {
+            const offer = await newPeer.createOffer();
+            await newPeer.setLocalDescription(offer);
 
-//             const payload = {
-//                 sdp: newPeer.localDescription,
-//                 streamId: inputStreamId
-//             };
+            const payload = {
+                sdp: newPeer.localDescription,
+                streamId: inputStreamId
+            };
 
-//             const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API}/consumer`, payload);
+            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API}/consumer`, payload);
 
-//             const desc = new RTCSessionDescription(data.sdp);
-//             await newPeer.setRemoteDescription(desc);
+            const desc = new RTCSessionDescription(data.sdp);
+            await newPeer.setRemoteDescription(desc);
 
-//             setStreamId(inputStreamId);
-//             setPeer(newPeer);
-//             setIsConnected(true);
-//         };
+            setStreamId(inputStreamId);
+            setPeer(newPeer);
+            setIsConnected(true);
+        };
 
-//         newPeer.addTransceiver('video', { direction: 'recvonly' });
-//     } catch (error) {
-//         console.error('View stream error:', error);
-//         setIsConnected(false);
-//     }
-// }
+        newPeer.addTransceiver('video', { direction: 'recvonly' });
+    } catch (error) {
+        console.error('View stream error:', error);
+        setIsConnected(false);
+    }
+}
 
   const stopViewing = () => {
     setIsJoined(false);
@@ -116,7 +124,7 @@ const JoinLiveStream = () => {
             </button>) : (
             <button
             type="submit"
-            // onClick={joinStream}
+            onClick={joinStream}
             className="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors"
           >
             Join Stream
