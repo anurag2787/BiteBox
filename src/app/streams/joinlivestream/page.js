@@ -30,51 +30,51 @@ const JoinLiveStream = () => {
     }
   }, [id]);
 
-  async function joinStream() {
-    setIsJoined(true);
-    try {
-        const newPeer = new RTCPeerConnection({
-            iceServers: [{ urls: "stun:stun.stunprotocol.org" }]
-        });
+//   async function joinStream() {
+//     setIsJoined(true);
+//     try {
+//         const newPeer = new RTCPeerConnection({
+//             iceServers: [{ urls: "stun:stun.stunprotocol.org" }]
+//         });
 
-        // Handle ICE candidates
-        newPeer.onicecandidate = async (event) => {
-            if (event.candidate) {
-                // You might want to send candidates to the server if needed
-            }
-        };
+//         // Handle ICE candidates
+//         newPeer.onicecandidate = async (event) => {
+//             if (event.candidate) {
+//                 // You might want to send candidates to the server if needed
+//             }
+//         };
 
-        newPeer.ontrack = (event) => {
-            if (videoRef.current) {
-                videoRef.current.srcObject = event.streams[0];
-            }
-        };
+//         newPeer.ontrack = (event) => {
+//             if (videoRef.current) {
+//                 videoRef.current.srcObject = event.streams[0];
+//             }
+//         };
 
-        newPeer.onnegotiationneeded = async () => {
-            const offer = await newPeer.createOffer();
-            await newPeer.setLocalDescription(offer);
+//         newPeer.onnegotiationneeded = async () => {
+//             const offer = await newPeer.createOffer();
+//             await newPeer.setLocalDescription(offer);
 
-            const payload = {
-                sdp: newPeer.localDescription,
-                streamId: inputStreamId
-            };
+//             const payload = {
+//                 sdp: newPeer.localDescription,
+//                 streamId: inputStreamId
+//             };
 
-            const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API}/consumer`, payload);
+//             const { data } = await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_API}/consumer`, payload);
 
-            const desc = new RTCSessionDescription(data.sdp);
-            await newPeer.setRemoteDescription(desc);
+//             const desc = new RTCSessionDescription(data.sdp);
+//             await newPeer.setRemoteDescription(desc);
 
-            setStreamId(inputStreamId);
-            setPeer(newPeer);
-            setIsConnected(true);
-        };
+//             setStreamId(inputStreamId);
+//             setPeer(newPeer);
+//             setIsConnected(true);
+//         };
 
-        newPeer.addTransceiver('video', { direction: 'recvonly' });
-    } catch (error) {
-        console.error('View stream error:', error);
-        setIsConnected(false);
-    }
-}
+//         newPeer.addTransceiver('video', { direction: 'recvonly' });
+//     } catch (error) {
+//         console.error('View stream error:', error);
+//         setIsConnected(false);
+//     }
+// }
 
   const stopViewing = () => {
     setIsJoined(false);
@@ -93,48 +93,46 @@ const JoinLiveStream = () => {
   return (
     <div className="p-4">
       <div className="max-w-4xl mx-auto">
-        <Suspense fallback={<div>Loading...</div>}>
-          {isConnected ? (
-            <div className="space-y-6">
-              <div className={`rounded-lg overflow-hidden ${darkMode ? "bg-gray-800" : "bg-white"}`}>
-                <div className="aspect-video relative bg-black">
-                  <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+        {isConnected ? (
+          <div className="space-y-6">
+            <div className={`rounded-lg overflow-hidden ${darkMode ? "bg-gray-800" : "bg-white"}`}>
+              <div className="aspect-video relative bg-black">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover"
+                />
               </div>
-              {isJoined ? (
-                <button
-                type="submit"
-                onClick={stopViewing}
-                className="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors"
-              >
-                Leave Stream
-              </button>) : (
+            </div>
+            {isJoined ? (
               <button
               type="submit"
-              onClick={joinStream}
+              onClick={stopViewing}
               className="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors"
             >
-              Join Stream
-            </button>
-              )}
+              Leave Stream
+            </button>) : (
+            <button
+            type="submit"
+            // onClick={joinStream}
+            className="w-full py-3 rounded-lg flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+          >
+            Join Stream
+          </button>
+            )}
 
-            </div>
-          ) : (
-            <div className="text-center p-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <div className="animate-pulse">
-                <div className="text-gray-500 dark:text-gray-400">
-                  Connecting to stream...
-                </div>
+          </div>
+        ) : (
+          <div className="text-center p-8 bg-gray-50 dark:bg-gray-800 rounded-lg">
+            <div className="animate-pulse">
+              <div className="text-gray-500 dark:text-gray-400">
+                Connecting to stream...
               </div>
             </div>
-          )}
-        </Suspense>
+          </div>
+        )}
       </div>
     </div>
   );
