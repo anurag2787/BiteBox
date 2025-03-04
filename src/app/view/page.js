@@ -57,6 +57,10 @@ const renderStyledContent = (content) => {
     if (inlineStyleRanges.length > 0) {
       inlineStyleRanges.forEach((range) => {
         const { offset, length, style } = range;
+        if (typeof styledText !== "string") {
+          console.error("styledText is not a string", styledText);
+          styledText = String(styledText); // Ensure it's a string
+        }
         const start = styledText.slice(0, offset);
         const middle = styledText.slice(offset, offset + length);
         const end = styledText.slice(offset + length);
@@ -92,6 +96,7 @@ const RecipeDetailsPage = () => {
   const [isLiked, setIsLiked] = useState(false);
   const { darkMode } = useDarkMode();
   const { user } = UserAuth(); // Access user from the AuthContext
+  const [id, setId] = useState();
 
   const userId = user ? user.email : null; // Use user.email if user is authenticated
 
@@ -102,10 +107,20 @@ const RecipeDetailsPage = () => {
     const match = url.match(regex);
     return match ? match[1] : null;
   };
+  
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const queryId = params.get("id");
+    setId(queryId);
+
+  }, []);
 
   useEffect(() => {
-    const id = searchParams.get("id");
-
+    if (id === null || id === undefined) {
+      return; // Wait until `id` is properly set
+    }
+    // const id = searchParams.get("id");
+    console.log(id);
     if (!id) {
       setError("Missing required recipe data");
       return;
@@ -131,7 +146,7 @@ const RecipeDetailsPage = () => {
     };
 
     fetchRecipe();
-  }, [searchParams, userId]);
+  }, [id, userId]);
 
   const handleLike = async () => {
     if (!user || !recipe) return;
