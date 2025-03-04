@@ -35,6 +35,7 @@ const PostDetailsPage = () => {
   const { darkMode } = useDarkMode();
   const { user } = UserAuth();
   const [shareSupported, setShareSupported] = useState(false);
+  const [postId, setPostId] = useState();
 
   const userId = user ? user.email : null;
 
@@ -69,11 +70,18 @@ const PostDetailsPage = () => {
   const { search } = useRouter();
   const searchParams = new URLSearchParams(search);
   useEffect(() => {
-    const postId = searchParams.get("id");
-    if (!postId) {
-      setError("Post ID is missing!");
-      return;
+    const params = new URLSearchParams(window.location.search);
+    const queryId = params.get("id");
+    setPostId(queryId);
+    // const postId = searchParams.get("id");
+    console.log(postId);
+    if (postId === null || postId === undefined) {
+      return; 
     }
+    // if (!postId) {
+    //   setError("Post ID is missing!");
+    //   return;
+    // }
 
     const fetchPost = async () => {
       try {
@@ -87,7 +95,7 @@ const PostDetailsPage = () => {
     };
 
     fetchPost();
-  }, [searchParams, userId]);
+  }, [postId, userId]);
 
   const handleLike = async () => {
     if (!userId || !post) return;
