@@ -28,6 +28,10 @@ const Cursor = () => {
     trail.style.pointerEvents = 'none';
     document.body.appendChild(trail);
 
+    if (window.innerWidth < 768) {
+      return; // Do not create cursor trail on smaller screens
+    }
+
     // Create circles
     const circles = Array.from({ length: 30 }, (_, index) => {
       const circle = document.createElement('div');
