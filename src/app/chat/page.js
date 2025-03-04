@@ -59,7 +59,7 @@ function Chat() {
     async function generateInitial() {
       try {
         const response = await axios({
-          url: `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`,
+          url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.NEXT_PUBLIC_API_KEY}`,
           method: "post",
           headers: { "Content-Type": "application/json" },
           data: {
@@ -88,7 +88,7 @@ function Chat() {
         .join("\n")}\nUser: ${p3}`;
       try {
         const response = await axios({
-          url: `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`,
+          url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.NEXT_PUBLIC_API_KEY}`,
           method: "post",
           headers: { "Content-Type": "application/json" },
           data: {
@@ -126,12 +126,11 @@ function Chat() {
     setInput(message);
     // setQuickoption(false);
     await handleSendMessage(message);
-    handleSendMessage();
 
   }
+  
 
   async function handleSendMessage(inputMessage = null) {
-    setCount(count+1);
     // console.log(count);
     const messageToSend = (inputMessage || input || "").toString();    
     setQuickoption(false);
@@ -140,15 +139,12 @@ function Chat() {
       return;
     }
 
-    if (!messageToSend.trim()) {
+    if (!messageToSend) {
       alert("Please enter a message before sending.");
       return;
     }
 
     setAnswer("");
-    if (count == 1) {
-      setChatbotheader(false)
-    }
 
     // Generate the conversational prompt
     const prompt = `Conversation Context:
@@ -161,7 +157,7 @@ function Chat() {
 
     try {
       const response = await axios({
-        url: `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${API_KEY}`,
+        url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.NEXT_PUBLIC_API_KEY}`,
         method: "post",
         headers: { "Content-Type": "application/json" },
         data: {
@@ -182,10 +178,15 @@ function Chat() {
 
       setInput(""); // Clear the input after sending the message
       chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      setCount(count+1);
+      if (count == 1) {
+        setChatbotheader(false)
+      }
     } catch (error) {
       setAnswer("An error occurred. Please try again.");
       alert("Something went wrong. Please rephrase your request.");
     }
+    
   }
 
 
