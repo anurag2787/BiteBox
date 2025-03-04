@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useDarkMode } from '../DarkModeContext'
 import axios from 'axios'
 import { useRouter } from "next/navigation"; // Correct API for App Directory
+import loader from '@/Components/loader'
 
 
 
@@ -39,7 +40,7 @@ const Menu = () => {
 
         fetchMeals()
     }, [searchQuery])
-
+    console.log("hi : " , filteredMeals.length)
     useEffect(() => {
         const filterItems = () => {
             let items = meals
@@ -113,17 +114,15 @@ const Menu = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Filtered Meals */}
-                <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-                    {filteredMeals.length === 0 ? (
-                        <div className='h-[28vh] w-full'>
-                            <h1 className='text-center text-4xl font-bold ml-5 text-red-500'>
-                                Oops! No Recipe Found
-                            </h1>
+                {filteredMeals.length===0 && (
+                        <div className='w-screen'>
+                            {loader()}
                         </div>
 
-                    ) : (
+                    )}
+                {/* Filtered Meals */}
+                {filteredMeals.length>0 && (<div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
+                    {
                         filteredMeals.map((meal, index) => (
                             <div
                                 key={index}
@@ -147,8 +146,8 @@ const Menu = () => {
                                 </div>
                             </div>
                         ))
-                    )}
-                </div>
+                    }
+                </div>)}
             </Section>
             <Footer />
         </main>

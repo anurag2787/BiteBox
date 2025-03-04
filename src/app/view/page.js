@@ -109,6 +109,14 @@ const RecipeDetailsPage = () => {
   };
   
   useEffect(() => {
+
+
+
+
+
+
+
+    
     const params = new URLSearchParams(window.location.search);
     const queryId = params.get("id");
     setId(queryId);

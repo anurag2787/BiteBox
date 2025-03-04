@@ -6,6 +6,7 @@ import { useDarkMode } from "../DarkModeContext";
 import { Video, Users, Play, Clock, Heart, MessageCircle } from "lucide-react";
 import { format } from "date-fns";
 import { UserAuth } from "../context/AuthContext";
+import Loader from "@/Components/loader";
 
 const StreamsPage = () => {
   const [liveStreams, setLiveStreams] = useState([]);
@@ -117,8 +118,8 @@ const StreamsPage = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+      <div className="w-full min-h-screen">
+        <Loader/>
       </div>
     );
   }
