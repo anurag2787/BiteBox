@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Loader } from "lucide-react";
 import { useDarkMode } from "../DarkModeContext";
+import Loader from "@/Components/loader";
+import { ScreenShare } from "lucide-react";
 
 function Page() {
   const [mealDetails, setMealDetails] = useState(null);
@@ -35,7 +36,8 @@ function Page() {
   if (isLoading || !mealDetails) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <Loader className="animate-spin" size={48} />
+        {/* <Loader className="animate-spin" size={48} /> */}
+        <Loader />
       </div>
     );
   }
@@ -55,7 +57,7 @@ function Page() {
       }`}
     >
       <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 shadow-2xl rounded-2xl overflow-hidden transform transition-all hover:scale-[1.01]">
-        <div className="relative h-[500px] w-full group">
+        <div className="relative h-[200px] md:h-[500px] w-full group">
           <img
             src={mealDetails.strMealThumb}
             alt={mealDetails.strMeal}
@@ -71,12 +73,12 @@ function Page() {
             </h1>
           </div>
         </div>
-        <div className="p-8 space-y-8">
+        <div className="p-4 md:p-8 space-y-8">
           <div className="prose prose-lg dark:prose-invert max-w-none">
             <h1 className="text-3xl font-bold text-gray-600 dark:text-gray-300 drop-shadow-lg mb-2">
               Recipe :
             </h1>
-            <ul className="mt-4 space-y-4 pl-6">
+            <ul className="mt-4 space-y-4 pl-3 md:pl-6">
               {instructions.map((step, index) => (
                 <li key={index} className="text-gray-700 dark:text-gray-300">
                   {step}
@@ -95,7 +97,7 @@ function Page() {
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  className="w-full aspect-video"
+                  className="w-[300px] h-[200px] md:w-full md:h-[400px] aspect-video"
                 />
               )}
             </div>
@@ -104,12 +106,12 @@ function Page() {
             <h1 className="text-base font-bold text-gray-600 dark:text-gray-300 drop-shadow-lg mb-2">
               Source:{" "}
               <a 
-                className="text-sm mr-4" 
+                className="text-sm mr-4 text-slate-500 flex flex-center" 
                 href={mealDetails.strSource}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {mealDetails.strSource}
+                {mealDetails.strSource} <ScreenShare className="w-5 ml-2"/>
               </a>
             </h1>
           )}

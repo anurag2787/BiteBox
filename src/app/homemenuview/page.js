@@ -25,7 +25,7 @@ function RecipeDisplay({ recipe, darkMode }) {
       }`}
     >
       <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 shadow-2xl rounded-2xl overflow-hidden transform transition-all hover:scale-[1.01]">
-        <div className="relative h-[500px] w-full group">
+        <div className="relative h-[200px] md:h-[500px] w-full group">
           <img
             src={recipe.imageLink}
             alt={recipe.title}
@@ -41,12 +41,12 @@ function RecipeDisplay({ recipe, darkMode }) {
             </h1>
           </div>
         </div>
-        <div className="p-8 space-y-8">
+        <div className="p-4 md:p-8 space-y-8">
           <div className="prose prose-lg dark:prose-invert max-w-none">
             <h1 className="text-3xl font-bold text-gray-600 dark:text-gray-300 drop-shadow-lg mb-2">
               Recipe :
             </h1>
-            <div className="mt-4 space-y-4 pl-6">
+            <div className="mt-4 space-y-4 pl-3 md:pl-6">
               {instructions.map((step, index) => (
                 <p key={index} className="text-gray-700 dark:text-gray-300">
                   {step}
@@ -65,7 +65,7 @@ function RecipeDisplay({ recipe, darkMode }) {
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
-                  className="w-full aspect-video"
+                  className="w-[300px] h-[200px] md:w-full md:h-[400px] aspect-video"
                 />
               </div>
             </div>
