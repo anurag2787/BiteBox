@@ -110,7 +110,7 @@ const RecipesPage = () => {
         <h1 className="text-3xl font-bold">Recipes</h1>
         <button
           onClick={handlePostRecipeClick}
-          className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600"
+          className="bg-blue-500 text-white ml-2 md:ml-0 md:text-sm text-xs px-4 py-2 rounded-xl hover:bg-blue-600"
         >
           Post New Recipe
         </button>

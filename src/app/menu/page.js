@@ -64,16 +64,16 @@ const Menu = () => {
                 {/* Header Container */}
                 <div className='flex flex-col gap-6 mb-12 w-full'>
                     {/* Title and Search Row */}
-                    <div className='flex justify-between items-center w-full'>
-                        <h1 className='text-6xl font-bold tracking-wide'>
+                    <div className='flex flex-col md:flex-row justify-between items-center w-full gap-4'>
+                        <h1 className='text-4xl md:text-6xl font-bold tracking-wide text-center md:text-left w-full md:w-auto'>
                             Menu
                             <span className={`blinking-underscore ${darkMode ? 'text-white' : 'text-black'}`}>
                                 _
                             </span>
                         </h1>
-
+                        
                         {/* Search Bar */}
-                        <div className='relative'>
+                        <div className='relative w-full md:w-auto'>
                             <svg
                                 className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
                                 xmlns="http://www.w3.org/2000/svg"
@@ -91,7 +91,7 @@ const Menu = () => {
                                 type="text"
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder="Search Here"
-                                className='pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black w-64 bg-white'
+                                className='pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black w-full md:w-64 bg-white'
                             />
                         </div>
                     </div>
