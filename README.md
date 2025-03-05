@@ -89,6 +89,8 @@ For any inquiries or feedback, feel free to reach out to the project maintainer:
 
 - **Mayank Mishra**
 - [GitHub Profile](https://github.com/M-ayank2005)
+- **Anurag Yadav**
+- [GitHub Profile](https://github.com/anurag2787)
 
 ---
 

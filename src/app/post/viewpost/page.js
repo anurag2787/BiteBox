@@ -199,7 +199,7 @@ const PostDetailsPage = () => {
         {/* Header Section */}
         <header className={`mb-6 rounded-xl p-6 ${darkMode ? "bg-gray-800" : "bg-white"
           } shadow-sm`}>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 overflow-hidden">
             <div className="flex items-center gap-4">
               <div className="relative h-12 w-12">
                 <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse" />
@@ -208,7 +208,7 @@ const PostDetailsPage = () => {
                 </div>
               </div>
               <div>
-                <h2 className="font-semibold text-lg">{post.username || post.user}</h2>
+                <h2 className="font-semibold text-sm md:text-lg">{post.username || post.user}</h2>
                 <div className="flex items-center gap-2 text-sm text-gray-500">
                   <Clock className="w-4 h-4" />
                   <span>{formattedDate}</span>
@@ -229,7 +229,7 @@ const PostDetailsPage = () => {
           </div>
 
           {post.thumbnail && (
-            <div className="relative w-full h-[400px] rounded-xl overflow-hidden mb-6">
+            <div className="relative w-full md:h-[400px] h-[200px] rounded-xl overflow-hidden mb-6">
               <Image
                 src={post.thumbnail || defaultImage}
                 alt={post.title}
@@ -317,14 +317,14 @@ const PostDetailsPage = () => {
                 className={`rounded-xl ${darkMode ? "bg-gray-700/50" : "bg-gray-100"
                   } p-5 space-y-4`}
               >
-                <div className="flex justify-between items-start gap-4">
+                <div className="flex justify-between items-start gap-4 max-w-full overflow-hidden">
                   <div className="flex gap-3">
                     <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
                       <span className="text-white font-medium">{comment.user[0]}</span>
                     </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{comment.user}</span>
+                    <div className="flex-1 overflow-hidden">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="md:font-medium text-sm">{comment.user}</span>
                         <span className="text-sm text-gray-500">• {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}</span>
                       </div>
                       <p className={`mt-1 ${darkMode ? "text-gray-300" : "text-gray-700"
@@ -346,7 +346,7 @@ const PostDetailsPage = () => {
                 </div>
 
                 {activeReplyId === comment._id && (
-                  <div className="flex gap-3 ml-12 mt-3">
+                  <div className="flex gap-3 ml-12 mt-3 max-w-full overflow-hidden">
                     <input
                       type="text"
                       value={replyText}
@@ -387,7 +387,7 @@ const PostDetailsPage = () => {
                     </button>
 
                     {expandedComments.has(comment._id) && (
-                      <div className="mt-4 space-y-4">
+                      <div className="mt-4 space-y-4 max-w-full overflow-hidden">
                         {comment.replies.map((reply) => (
                           <div
                             key={reply._id}
@@ -401,7 +401,7 @@ const PostDetailsPage = () => {
                                 </span>
                               </div>
                               <div>
-                                <div className="flex items-center gap-2">
+                                <div className="flex flex-wrap items-center gap-2">
                                   <span className="font-medium text-sm">{reply.user}</span>
                                   <span className="text-xs text-gray-500">• 1h ago</span>
                                 </div>
