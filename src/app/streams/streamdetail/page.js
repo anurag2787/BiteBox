@@ -28,14 +28,18 @@ const StreamDetailPage = () => {
   const { user } = UserAuth();
 
   const userId = user ? user.email : null;
-  const searchParams = new URLSearchParams(router.query);
+  // const searchParams = new URLSearchParams(router.query);
   useEffect(() => {
-    const streamId = searchParams.get("id");
+    // Move URL params extraction inside useEffect
+    const params = new URLSearchParams(window.location.search);
+    const streamId = params.get("id");
+    
     if (!streamId) {
       setError("Stream ID is missing!");
+      setLoading(false);
       return;
     }
-
+    
     const fetchStream = async () => {
       try {
         const response = await axios.get(`${process.env.NEXT_PUBLIC_BACKEND_API}/api/streams/${streamId}`);
@@ -43,13 +47,14 @@ const StreamDetailPage = () => {
         setIsLiked(response.data.likes?.some(like => like.userId === userId));
         setLoading(false);
       } catch (err) {
+        console.error("Error fetching stream:", err);
         setError("Failed to fetch stream details");
         setLoading(false);
       }
     };
-
+    
     fetchStream();
-  }, [searchParams, userId]);
+  }, [userId]);
 
   const handleLike = async () => {
     if (!userId || !stream) return;

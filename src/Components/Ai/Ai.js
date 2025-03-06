@@ -118,9 +118,6 @@ function Ai() {
                     alt="AI Bot"
                     className="w-full h-full object-cover"
                 />
-                <div className="w-full h-full bg-white flex items-center justify-center">
-                    <span className="text-blue-500 text-sm font-bold">AI Bot</span>
-                </div>
             </div>
         </Link>
     );
