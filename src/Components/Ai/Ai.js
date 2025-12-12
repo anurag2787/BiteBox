@@ -1,13 +1,18 @@
 "use client"
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 function Ai() {
+    const pathname = usePathname();
     // Initialize with default position, will be updated after mount
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [dragging, setDragging] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
     
+    // Hide on chat page
+    if (pathname === '/chat') return null;
+
     // Set initial position after component mounts
     useEffect(() => {
         setPosition({ 

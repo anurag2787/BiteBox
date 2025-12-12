@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import { GoogleGenAI } from "@google/genai";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { materialDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -20,6 +20,19 @@ function Chat() {
   const [count, setCount] = useState(0);
   const { darkMode } = useDarkMode()
   
+  const ai = new GoogleGenAI({ apiKey: process.env.NEXT_PUBLIC_API_KEY });
+
+  useEffect(() => {
+    async function checkModels() {
+      try {
+        const response = await ai.models.list();
+        console.log("Available Models:", response);
+      } catch (e) {
+        console.error("Failed to list models:", e);
+      }
+    }
+    checkModels();
+  }, []);
 
   // More conversational and flexible system prompts
   const SYSTEM_PROMPTS = [
@@ -59,18 +72,13 @@ function Chat() {
 
     async function generateInitial() {
       try {
-        const response = await axios({
-          url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.NEXT_PUBLIC_API_KEY}`,
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-          data: {
-            contents: [{ role: "user", parts: [{ text: p1 }] }],
-          },
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: p1,
         });
+        const text = response.text;
 
-        const botResponse = cleanResponse(
-          response.data.candidates[0].content.parts[0].text
-        );
+        const botResponse = cleanResponse(text);
         historyRef.current.push(
           { role: "user", text: p1 },
           { role: "bot", text: botResponse }
@@ -88,18 +96,13 @@ function Chat() {
         .map((entry) => `${entry.role}: ${entry.text}`)
         .join("\n")}\nUser: ${p3}`;
       try {
-        const response = await axios({
-          url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.NEXT_PUBLIC_API_KEY}`,
-          method: "post",
-          headers: { "Content-Type": "application/json" },
-          data: {
-            contents: [{ role: "user", parts: [{ text: prompt }] }],
-          },
+        const response = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: prompt,
         });
+        const text = response.text;
 
-        const botResponse = cleanResponse(
-          response.data.candidates[0].content.parts[0].text
-        );
+        const botResponse = cleanResponse(text);
         historyRef.current.push(
           { role: "user", text: p3 },
           { role: "bot", text: generateInitialGreeting() }
@@ -132,11 +135,8 @@ function Chat() {
   
 
   async function handleSendMessage(inputMessage = null) {
-    // console.log(count);
-    console.log(inputMessage);
-    const messageToSend = (input || inputMessage || "").toString();  
-    console.log(messageToSend);  
-    setQuickoption(false);
+    const messageToSend = (input || inputMessage || "").toString().trim();
+    
     if (!ready) {
       alert("Please wait while the AI is preparing...");
       return;
@@ -159,20 +159,14 @@ function Chat() {
   Respond in a friendly, natural manner. Use markdown for formatting if needed. Add emojis to make the conversation engaging.`;
 
     try {
-      const response = await axios({
-        url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.NEXT_PUBLIC_API_KEY}`,
-        method: "post",
-        headers: { "Content-Type": "application/json" },
-        data: {
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-        },
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
       });
+      const text = response.text;
 
-      const botResponse = cleanResponse(
-        response.data.candidates[0].content.parts[0].text
-        
-      );
-      console.log(response);
+      const botResponse = cleanResponse(text);
+      
       setHistory((prevHistory) => [
         ...prevHistory,
         { role: "user", text: messageToSend },
@@ -186,6 +180,7 @@ function Chat() {
         setChatbotheader(false)
       }
     } catch (error) {
+      console.error("Chat error:", error);
       setAnswer("An error occurred. Please try again.");
       alert("Something went wrong. Please rephrase your request.");
     }

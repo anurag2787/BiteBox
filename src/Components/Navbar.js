@@ -6,6 +6,7 @@ import { UserAuth } from "../app/context/AuthContext";
 import DarkModeToggle from './DarkModeToggle';
 import { Menu, X } from 'lucide-react';
 import ModeToggle from './modeToggle';
+import logo from '../lib/logo.png'; 
 
 const Navbar = () => {
     const { user, logOut, loading } = UserAuth();
@@ -41,7 +42,7 @@ const Navbar = () => {
                     <div className="flex items-center space-x-3">
                         <div className="flex-shrink-0 w-10 h-10 relative">
                             <Image
-                                src="https://ih0.redbubble.net/image.465217072.5837/sticker,375x360-bg,ffffff.u3.png"
+                                src={logo}
                                 alt="Logo"
                                 fill
                                 className="rounded-full bg-white p-1 object-contain"
