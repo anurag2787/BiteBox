@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Image from "next/image";
 import { useDarkMode } from "../DarkModeContext";
 import { Video, Users, Play, Clock, Heart, MessageCircle } from "lucide-react";
 import { format } from "date-fns";
@@ -59,9 +60,11 @@ const StreamsPage = () => {
         } shadow-lg`}
       >
         <div className="aspect-video relative">
-          <img
+          <Image
             src={stream.thumbnail || "/placeholder-stream.jpg"}
             alt={stream.title}
+            width={640}
+            height={360}
             className="w-full h-full object-cover"
           />
           {type === "live" && (

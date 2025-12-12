@@ -147,7 +147,7 @@ const JoinLiveStream = () => {
     }
   }
 
-  const stopViewing = () => {
+  const stopViewing = React.useCallback(() => {
     if (videoRef.current) {
       if (videoRef.current.srcObject) {
         const tracks = videoRef.current.srcObject.getTracks();
@@ -163,14 +163,14 @@ const JoinLiveStream = () => {
     setIsConnected(true); // Reset to true since we're done viewing, not disconnected
     setIsJoined(false); // Set isJoined to false when stopped
     setConnectionAttempts(0);
-  };
+  }, [peer]);
 
   // Cleanup on component unmount
   useEffect(() => {
     return () => {
       stopViewing();
     };
-  }, []);
+  }, [stopViewing]);
 
   return (
     <div className="p-4">

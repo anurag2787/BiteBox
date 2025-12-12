@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Image from "next/image";
 import { UserAuth } from "../context/AuthContext";
 import { Heart } from "lucide-react";
 import Loader from "@/Components/loader";
@@ -118,19 +119,20 @@ const RecipesPage = () => {
       {recipes.length === 0 && (<div className="w-full"><Loader/></div>)}
       {/* Recipe Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        
-
-        {recipes.length>0 && ( <>
-          {recipes.map((recipe) => (
+        {recipes.length > 0 && (
+          <>
+            {recipes.map((recipe) => (
             <div
               key={recipe._id}
               className="border rounded-lg p-4 cursor-pointer hover:shadow-lg"
               onClick={() => handleRecipeClick(recipe)}
             >
               {/* Cover Image */}
-              <img
+              <Image
                 src={recipe.coverImage}
                 alt={recipe.title}
+                width={400}
+                height={192}
                 className="w-full h-48 object-cover rounded-md mb-4"
               />
               {/* Title and Likes */}
@@ -162,7 +164,7 @@ const RecipesPage = () => {
             </div>
           ))}
           </>
-      )}
+        )}
       </div>
     </div>
   );

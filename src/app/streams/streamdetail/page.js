@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import Image from "next/image";
 import { useDarkMode } from "../../DarkModeContext";
 import { 
   Heart, 
@@ -130,9 +131,11 @@ const StreamDetailPage = () => {
         }`}>
           {/* Stream Thumbnail */}
                 <div className="relative aspect-video max-w-4xl mx-auto">
-                <img
+                <Image
                   src={stream.thumbnail || "/placeholder-stream.jpg"}
                   alt={stream.title}
+                  width={1280}
+                  height={720}
                   className="w-full h-full object-cover rounded-2xl pt-5"
                 />
                 </div>
