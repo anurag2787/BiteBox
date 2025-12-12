@@ -9,9 +9,6 @@ function Ai() {
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [dragging, setDragging] = useState(false);
     const [offset, setOffset] = useState({ x: 0, y: 0 });
-    
-    // Hide on chat page
-    if (pathname === '/chat') return null;
 
     // Set initial position after component mounts
     useEffect(() => {
@@ -105,6 +102,9 @@ function Ai() {
             e.preventDefault();
         }
     };
+
+    // Hide on chat page
+    if (pathname === '/chat') return null;
 
     return (
         <Link href="/chat" passHref onClick={handleClick}>
