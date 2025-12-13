@@ -282,50 +282,52 @@ const RecipesPage = () => {
               }`}
             >
               {/* Cover Image */}
-              <div className="relative w-full h-48">
-                <Image
-                  src={recipe.coverImage}
-                  alt={recipe.title}
-                  layout="fill"
-                  objectFit="cover"
-                />
-              </div>
-              
-              {/* Content */}
-              <div className="p-4">
-                <h2 className={`text-xl font-semibold mb-3 ${
-                  darkMode ? 'text-white' : 'text-gray-800'
-                }`}>{recipe.title}</h2>
-                
-                {/* Likes */}
-                <div className="flex items-center mb-4">
-                  <button onClick={(e) => {
-                    e.stopPropagation();
-                    likeClick(e, recipe._id);
-                  }}>
-                    <Heart
-                      fill={
-                        Array.isArray(recipe.likes) &&
-                        recipe.likes.some((like) => like.userId === user?.email)
-                          ? "#ec4899"
-                          : "none"
-                      }
-                      stroke={
-                        Array.isArray(recipe.likes) &&
-                        recipe.likes.some((like) => like.userId === user?.email)
-                          ? "#ec4899"
-                          : "currentColor"
-                      }
-                      className={`w-6 h-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}
-                    />
-                  </button>
-                  <span className={`text-lg ml-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    {Array.isArray(recipe.likes) ? recipe.likes.length : 0}
-                  </span>
-                </div>
-              </div>
+                      <div className="relative w-full h-48">
+                      <Image
+                        src={recipe.coverImage}
+                        alt={recipe.title}
+                        layout="fill"
+                        objectFit="cover"
+                      />
+                      </div>
+                      
+                      {/* Content */}
+                      <div className="p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <h2 className={`text-xl font-semibold flex-1 ${
+                        darkMode ? 'text-white' : 'text-gray-800'
+                        }`}>{recipe.title}</h2>
+                        
+                        {/* Likes */}
+                        <div className="flex items-center ml-4">
+                        <button onClick={(e) => {
+                          e.stopPropagation();
+                          likeClick(e, recipe._id);
+                        }}>
+                          <Heart
+                          fill={
+                            Array.isArray(recipe.likes) &&
+                            recipe.likes.some((like) => like.userId === user?.email)
+                            ? "#ec4899"
+                            : "none"
+                          }
+                          stroke={
+                            Array.isArray(recipe.likes) &&
+                            recipe.likes.some((like) => like.userId === user?.email)
+                            ? "#ec4899"
+                            : "currentColor"
+                          }
+                          className={`w-6 h-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}
+                          />
+                        </button>
+                        <span className={`text-lg ml-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                          {Array.isArray(recipe.likes) ? recipe.likes.length : 0}
+                        </span>
+                        </div>
+                      </div>
+                      </div>
 
-              {/* View Recipe Button */}
+                      {/* View Recipe Button */}
               <div className="mb-4 flex justify-center items-center">
                 <button 
                   onClick={() => handleRecipeClick(recipe)}
