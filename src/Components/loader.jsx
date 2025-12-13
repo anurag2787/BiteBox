@@ -6,8 +6,7 @@ function Loader() {
 
   return (
     <div
-      className={`h-screen flex flex-col items-center justify-center gap-8 
-      bg-gradient-to-br ${darkMode ? "from-black via-black to-gray-900" : "from-white via-white to-white"}`}
+      className={`flex flex-col items-center justify-center gap-8 py-20`}
     >
       {/* Loader Animation */}
       <div className="relative">

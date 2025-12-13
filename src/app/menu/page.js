@@ -115,7 +115,7 @@ const Menu = () => {
                     </div>
                 </div>
                 {filteredMeals.length===0 && (
-                        <div className='w-screen'>
+                        <div className='w-full'>
                             {loader()}
                         </div>
 
@@ -126,7 +126,9 @@ const Menu = () => {
                         filteredMeals.map((meal, index) => (
                             <div
                                 key={index}
-                                className='bg-gray-300 rounded-lg shadow-lg overflow-hidden transition duration-300 ease-in-out transform hover:scale-105'
+                                className={`rounded-lg shadow-lg overflow-hidden transition duration-300 ease-in-out transform hover:scale-105 ${
+                                    darkMode ? 'bg-gray-800' : 'bg-white'
+                                }`}
                             >
                                 <div className='relative w-full h-48'>
                                     <Image
@@ -137,8 +139,12 @@ const Menu = () => {
                                     />
                                 </div>
                                 <div className='p-6'>
-                                    <h2 className='text-2xl text-black font-bold'>{meal.strMeal}</h2>
-                                    <p className='text-gray-700 '>{meal.strInstructions.slice(0, 100)}...</p>
+                                    <h2 className={`text-2xl font-bold ${
+                                        darkMode ? 'text-white' : 'text-black'
+                                    }`}>{meal.strMeal}</h2>
+                                    <p className={`mt-2 ${
+                                        darkMode ? 'text-gray-300' : 'text-gray-700'
+                                    }`}>{meal.strInstructions.slice(0, 100)}...</p>
                                 </div>
                                 <div className='mb-4 flex justify-center items-center'>
                                     

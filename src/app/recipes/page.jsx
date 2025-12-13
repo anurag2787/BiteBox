@@ -269,28 +269,38 @@ const RecipesPage = () => {
       )}
 
       {/* Recipe Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredRecipes.length > 0 && (
           <>
             {filteredRecipes.map((recipe) => (
             <div
               key={recipe._id}
-              className="border rounded-lg p-4 cursor-pointer hover:shadow-lg"
-              onClick={() => handleRecipeClick(recipe)}
+              className={`rounded-lg shadow-lg overflow-hidden transition duration-300 ease-in-out transform hover:scale-105 ${
+                darkMode ? 'bg-gray-800' : 'bg-white'
+              }`}
             >
               {/* Cover Image */}
-              <Image
-                src={recipe.coverImage}
-                alt={recipe.title}
-                width={400}
-                height={192}
-                className="w-full h-48 object-cover rounded-md mb-4"
-              />
-              {/* Title and Likes */}
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">{recipe.title}</h2>
-                <div className="flex items-center">
-                  <button onClick={(e) => likeClick(e, recipe._id)}>
+              <div className="relative w-full h-48">
+                <Image
+                  src={recipe.coverImage}
+                  alt={recipe.title}
+                  layout="fill"
+                  objectFit="cover"
+                />
+              </div>
+              
+              {/* Content */}
+              <div className="p-4">
+                <h2 className={`text-xl font-semibold mb-3 ${
+                  darkMode ? 'text-white' : 'text-gray-800'
+                }`}>{recipe.title}</h2>
+                
+                {/* Likes */}
+                <div className="flex items-center mb-4">
+                  <button onClick={(e) => {
+                    e.stopPropagation();
+                    likeClick(e, recipe._id);
+                  }}>
                     <Heart
                       fill={
                         Array.isArray(recipe.likes) &&
@@ -304,13 +314,23 @@ const RecipesPage = () => {
                           ? "#ec4899"
                           : "currentColor"
                       }
-                      className="w-6 h-6"
+                      className={`w-6 h-6 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}
                     />
                   </button>
-                  <span className="text-lg ml-2">
+                  <span className={`text-lg ml-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                     {Array.isArray(recipe.likes) ? recipe.likes.length : 0}
                   </span>
                 </div>
+              </div>
+
+              {/* View Recipe Button */}
+              <div className="mb-4 flex justify-center items-center">
+                <button 
+                  onClick={() => handleRecipeClick(recipe)}
+                  className="w-32 h-10 bg-yellow-400 text-gray-600 rounded-full hover:bg-yellow-500 transition hover:font-semibold"
+                >
+                  Recipe
+                </button>
               </div>
             </div>
           ))}
