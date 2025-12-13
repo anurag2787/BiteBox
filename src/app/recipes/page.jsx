@@ -7,6 +7,7 @@ import Image from "next/legacy/image";
 import { UserAuth } from "../context/AuthContext";
 import { Heart, Search, X } from "lucide-react";
 import Loader from "@/Components/loader";
+import { useDarkMode } from "../DarkModeContext";
 
 const RecipesPage = () => {
   const [recipes, setRecipes] = useState([]);
@@ -15,6 +16,7 @@ const RecipesPage = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const router = useRouter();
   const { user } = UserAuth();
+  const { darkMode } = useDarkMode();
 
   const categories = [
     "All",
