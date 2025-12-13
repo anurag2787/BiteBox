@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
+import Image from "next/legacy/image"
 import food1 from '../lib/food1.jpg'
 import food2 from '../lib/food2.jpg'
 import food3 from '../lib/food3.jpg'

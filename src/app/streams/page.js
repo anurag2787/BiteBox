@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { useDarkMode } from "../DarkModeContext";
 import { Video, Users, Play, Clock, Heart, MessageCircle } from "lucide-react";
 import { format } from "date-fns";

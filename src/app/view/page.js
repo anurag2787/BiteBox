@@ -7,7 +7,7 @@ import loader from "@/Components/loader";
 import { Heart } from "lucide-react";
 import { format } from "date-fns";
 import { UserAuth } from "../context/AuthContext"; // Ensure the correct import
-import Image from "next/image";
+import Image from "next/legacy/image";
 
 const renderStyledContent = (content) => {
   if (!content || !content.blocks) return null;

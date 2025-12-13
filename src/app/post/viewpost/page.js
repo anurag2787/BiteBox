@@ -19,7 +19,7 @@ import {
 import { format } from "date-fns";
 import { UserAuth } from "../../context/AuthContext";
 import loader from "@/Components/loader";
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import defaultImage from "@/lib/general.png";
 
 const PostDetailsPage = () => {

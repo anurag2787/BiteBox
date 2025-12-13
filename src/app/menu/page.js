@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import Footer from '../../Components/Footer'
 import Section from '@/Components/Section'
-import Image from 'next/image'
+import Image from "next/legacy/image"
 import { useDarkMode } from '../DarkModeContext'
 import axios from 'axios'
 import { useRouter } from "next/navigation"; // Correct API for App Directory

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import gif from '../../../public/err.gif'
-import Image from 'next/image'
+import Image from "next/legacy/image"
 import { useDarkMode } from '../DarkModeContext'
 
 export default function Page() {

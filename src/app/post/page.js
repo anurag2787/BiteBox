@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Calendar, ChevronRight, User, Clock, Heart, Share2 } from "lucide-react";
 import { useDarkMode } from "../DarkModeContext";
-import Image from 'next/image'
+import Image from "next/legacy/image"
 
 import { UserAuth } from "../context/AuthContext";
 import defaultImage from "@/lib/general.png"

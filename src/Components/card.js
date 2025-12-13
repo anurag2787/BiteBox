@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
+import Image from "next/legacy/image"
 import { useRouter } from "next/navigation"; // Correct API for App Directory
 
 const Card = ({ id, imageSrc, title, description }) => {

@@ -3,7 +3,7 @@
 import React from "react";
 import Footer from "../../Components/Footer";
 import Navbar from "../../Components/Navbar";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { useDarkMode } from "../DarkModeContext";
 
 function About() {

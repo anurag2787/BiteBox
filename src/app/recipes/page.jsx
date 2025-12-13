@@ -1,17 +1,34 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { UserAuth } from "../context/AuthContext";
-import { Heart } from "lucide-react";
+import { Heart, Search, X } from "lucide-react";
 import Loader from "@/Components/loader";
 
 const RecipesPage = () => {
   const [recipes, setRecipes] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const router = useRouter();
   const { user } = UserAuth();
+
+  const categories = [
+    "All",
+    "Appetizer",
+    "Main Course",
+    "Dessert",
+    "Breakfast",
+    "Lunch",
+    "Dinner",
+    "Snack",
+    "Beverage",
+    "Salad",
+    "Soup"
+  ];
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -27,6 +44,58 @@ const RecipesPage = () => {
 
     fetchRecipes();
   }, []);
+
+  // Memoized filtering - prevents unnecessary recalculations
+  const filteredRecipes = useMemo(() => {
+    let filtered = recipes;
+
+    // Filter by category
+    if (selectedCategory !== "All") {
+      filtered = filtered.filter(
+        (recipe) => recipe.category === selectedCategory
+      );
+    }
+
+    // Filter by search query
+    if (searchQuery.trim() !== "") {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter((recipe) =>
+        recipe.title.toLowerCase().includes(query)
+      );
+    }
+
+    return filtered;
+  }, [recipes, selectedCategory, searchQuery]);
+
+  // Get search suggestions
+  const searchSuggestions = useMemo(() => {
+    if (searchQuery.trim() === "" || !showSuggestions) return [];
+    
+    const query = searchQuery.toLowerCase();
+    return recipes
+      .filter((recipe) => recipe.title.toLowerCase().includes(query))
+      .slice(0, 5) // Limit to 5 suggestions
+      .map((recipe) => recipe.title);
+  }, [recipes, searchQuery, showSuggestions]);
+
+  const handleCategoryClick = (category) => {
+    setSelectedCategory(category);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    setShowSuggestions(true);
+  };
+
+  const handleSuggestionClick = (suggestion) => {
+    setSearchQuery(suggestion);
+    setShowSuggestions(false);
+  };
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setShowSuggestions(false);
+  };
 
   const handleRecipeClick = (recipe) => {
     router.push(`/view?id=${encodeURIComponent(recipe._id)}`);
@@ -107,7 +176,7 @@ const RecipesPage = () => {
   return (
     <div className="container mx-auto p-4">
       {/* Header with Title and Post Recipe Button */}
-      <div className="flex justify-between items-center m-6 mb-10">
+      <div className="flex justify-between items-center m-6 mb-6">
         <h1 className="text-3xl font-bold">Recipes</h1>
         <button
           onClick={handlePostRecipeClick}
@@ -116,12 +185,90 @@ const RecipesPage = () => {
           Post New Recipe
         </button>
       </div>
+
+      {/* Search Bar */}
+      <div className="mx-6 mb-6 max-w-md">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onFocus={() => setShowSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+            placeholder="Search recipes..."
+            className="w-full pl-10 pr-10 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-600 dark:text-white transition-all"
+          />
+          {searchQuery && (
+            <button
+              onClick={clearSearch}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            >
+              <X size={18} />
+            </button>
+          )}
+          
+          {/* Search Suggestions Dropdown */}
+          {showSuggestions && searchSuggestions.length > 0 && (
+            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              {searchSuggestions.map((suggestion, index) => (
+                <div
+                  key={index}
+                  onClick={() => handleSuggestionClick(suggestion)}
+                  className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                >
+                  {suggestion}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Category Filter */}
+      <div className="mx-6 mb-8">
+        <div className="flex flex-wrap gap-2">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => handleCategoryClick(category)}
+              className={`px-4 py-2 rounded-full font-medium transition-all duration-200 ${
+                selectedCategory === category
+                  ? "bg-blue-500 text-white shadow-lg transform scale-105"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Results count */}
+      <div className="mx-6 mb-4">
+        <p className="text-gray-600 dark:text-gray-400">
+          Showing {filteredRecipes.length} recipe{filteredRecipes.length !== 1 ? "s" : ""}
+          {selectedCategory !== "All" && ` in ${selectedCategory}`}
+          {searchQuery && ` matching "${searchQuery}"`}
+        </p>
+      </div>
+
       {recipes.length === 0 && (<div className="w-full"><Loader/></div>)}
+      
+      {/* No results message */}
+      {recipes.length > 0 && filteredRecipes.length === 0 && (
+        <div className="text-center py-12">
+          <p className="text-xl text-gray-500 dark:text-gray-400">
+            No recipes found. Try a different search or category.
+          </p>
+        </div>
+      )}
+
       {/* Recipe Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {recipes.length > 0 && (
+        {filteredRecipes.length > 0 && (
           <>
-            {recipes.map((recipe) => (
+            {filteredRecipes.map((recipe) => (
             <div
               key={recipe._id}
               className="border rounded-lg p-4 cursor-pointer hover:shadow-lg"

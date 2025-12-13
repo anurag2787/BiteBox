@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import { UserAuth } from "../app/context/AuthContext";
 import DarkModeToggle from './DarkModeToggle';
 import { Menu, X } from 'lucide-react';
@@ -44,7 +44,7 @@ const Navbar = () => {
                             <Image
                                 src={logo}
                                 alt="Logo"
-                                fill
+                                fill="true"
                                 className="rounded-full bg-white p-1 object-contain"
                                 onError={() => setImgError(true)}
                                 unoptimized // Add this if the external image source has issues with Next.js image optimization

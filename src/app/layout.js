@@ -6,6 +6,7 @@ import { AuthContextProvider } from "../app/context/AuthContext";
 import { DarkModeProvider } from "./DarkModeContext";
 import Ai from "@/Components/Ai/Ai";
 import Cursor from "@/Components/Cursor/Cursor";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,8 +17,21 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
+      <Script id="dark-mode-script" strategy="beforeInteractive">
+        {`
+          (function() {
+            try {
+              const savedMode = localStorage.getItem('darkMode');
+              const darkMode = savedMode ? savedMode === 'true' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+              if (darkMode) {
+                document.documentElement.classList.add('dark');
+              }
+            } catch (e) {}
+          })();
+        `}
+      </Script>
       <AuthContextProvider>
         <DarkModeProvider>
         <div className="relative min-h-screen">
