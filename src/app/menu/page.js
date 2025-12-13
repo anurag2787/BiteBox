@@ -128,13 +128,14 @@ const Menu = () => {
                                 key={index}
                                 className='bg-gray-300 rounded-lg shadow-lg overflow-hidden transition duration-300 ease-in-out transform hover:scale-105'
                             >
-                                <Image
-                                    src={meal.strMealThumb}
-                                    alt={meal.strMeal}
-                                    width={50}
-                                    height={50}
-                                    className='w-full h-48 object-cover'
-                                />
+                                <div className='relative w-full h-48'>
+                                    <Image
+                                        src={meal.strMealThumb}
+                                        alt={meal.strMeal}
+                                        layout='fill'
+                                        objectFit='cover'
+                                    />
+                                </div>
                                 <div className='p-6'>
                                     <h2 className='text-2xl text-black font-bold'>{meal.strMeal}</h2>
                                     <p className='text-gray-700 '>{meal.strInstructions.slice(0, 100)}...</p>
